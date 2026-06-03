@@ -48,10 +48,65 @@ System.out.println(bd.getConstructorArgumentValues().getArgumentCount():
 **Option 1 - Constructor injection (preferred)**
 ```java
 @Service
-public class OrderService t
-private final ApplicationContext ctx;
-public OrderService (ApplicationContext ctx) {
-this.ctx = ctx;
-// ctx is fully refreshed at injection time
+public class OrderService {
+  private final ApplicationContext ctx;
+  public OrderService (ApplicationContext ctx) {
+    this.ctx = ctx;   // ctx is fully refreshed at injection time
+  }
 }
 ```
+Use when you genuinely need to look up beans dynamically (e.g. strategy pattern by name).
+
+**Option 2 - `ApplicationContextAware` (infrastructure/library code)**
+```java
+@Component
+public class BeanLocator implements ApplicationContextAware {
+private ApplicationContext ctx;
+  @override
+  public void setApplicationContext(ApplicationContext ctx) {
+    this.ctx = ctx;  // called at step 3 of bean lifecycle (Aware callbacks)
+  }
+
+  public ‹T> T getBean(Class<T> type) {
+    return ctx-getBean(type) ;
+  }
+}
+```
+Spring detects `ApplicationContextAware` via `ApplicationContextAwareProcessor` (a built-in BPP registered at `refresh()` step 3) and calls `setApplicationContext` during the Aware callback phase of each bean's lifecycle.
+**Option 3 - Static holder (last resort, avoid in greenfield)**
+```java
+@Component
+public class SpringContext implements ApplicationContextAware f
+  private static ApplicationContext context;
+  @override
+  public void setApplicationContext(ApplicationContext ctx) {
+    SpringContext.context = ctx;
+  }
+  public static ‹T› T getBean(Class<T> type) {
+    return context getBean (type) ;
+  }
+}
+```
+Used in legacy code where DI is unavailable (static utility methods, Hibernate `UserType`, etc.). The risk: `context` is `null` until Spring has called `setApplicationContext`, and any static call before that throws `NullPointerException`.
+
+### ConfigurableApplicationContext* — Lifecycle Control
+`SpringApplication.run()` returns `ConfigurableApplicationContext`, not just `ApplicationContext`. This gives you lifecycle control:
+```java
+ConfigurableApplicationContext ctx = SpringApplication.run(App.class, args);
+
+// Graceful shutdown - triggers @PreDestroy, ContextClosedEvent, SmartLifecycle.stop()
+ctx. close();
+
+// Register JVM shutdown hook (Spring Boot does this automatically via registerShutdownHook())
+ctx. registerShutdownHook):
+
+// Programmatic context construction before refresh) - useful for tests/tooling
+AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+ctx. register(MyConfig.class);
+ctx. getEnvironment) -getPropertySources()
+   .addFirst(new MapPropertySource ("overrides", Map.of("server-port", "0")));
+ctx.refresh(); // context is now live
+ctx.getBean(MyService.class).doWork();
+ctx. close();
+```
+

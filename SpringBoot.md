@@ -1,4 +1,4 @@
-### Why each "refresh()' step matters as an SDE
+### Why each `refresh()` step matters as an SDE
 
 Understanding *which step* something happens in tells you *why* a bug manifests the way it does and *where* to look when things break.
 | Step | What happens | SDE production consequence |
@@ -89,7 +89,7 @@ public class SpringContext implements ApplicationContextAware f
 ```
 Used in legacy code where DI is unavailable (static utility methods, Hibernate `UserType`, etc.). The risk: `context` is `null` until Spring has called `setApplicationContext`, and any static call before that throws `NullPointerException`.
 
-### ConfigurableApplicationContext* — Lifecycle Control
+### ConfigurableApplicationContext — Lifecycle Control
 `SpringApplication.run()` returns `ConfigurableApplicationContext`, not just `ApplicationContext`. This gives you lifecycle control:
 ```java
 ConfigurableApplicationContext ctx = SpringApplication.run(App.class, args);

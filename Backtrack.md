@@ -426,7 +426,7 @@ import java.util.*;
 
 ### Just want the count* of solutions?
 ```java
-public class NQueensCount 1
+public class NQueensCount {
      public int totalNQueens(int n) {
           return backtrack(0, n, new boolean[n],
           new boolean[2 *n - 1], new boolean[2 * n - 1]);
@@ -447,4 +447,34 @@ public class NQueensCount 1
 }
 
 // new NQueensCount) -totalNQueens (8) -> 92
+```
+
+### Bitmask variant (fastest, for the curious)
+For larger N, you can replace the boolean arrays with `int` bitmasks. Each set bit marks an attacked column/diagonal, and `Integer.numberOfTrailingZeros` extracts candidate columns:
+
+```java
+public class NQueensBitmask {
+     private int n, count;
+     public int totalnQueens(int n) {
+          this.n = n;
+          this.count = 0;
+          backtrack(e, 0, 0):
+          return count;
+     }
+
+     // cols, di, d2 are bitmasks of attacked positions
+     private void backtrack(int cols, int di, int d2) {
+          if (cols == (1 << n) - 1) {  // all columns filled
+               count++;
+               return;
+          }
+          int available =~(cols | d1 | d2) & ((1 << n) - 1);
+          while (available != 0) {
+               int bit = available & -available;    // lowest set bit
+               available -= bit;   // mark this column as tried
+               // di shifts left, d2 shifts right as we descend one row
+               backtrack(cols | bit, (d1 | bit) < 1, (d2 | bit) >> 1);
+          }
+     }
+}
 ```

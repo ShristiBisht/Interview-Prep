@@ -105,7 +105,7 @@ graph TD
   C --> C1["[3,1]"]
   C --> C2["[3,2]"]
 ```
-<div align="right"><a href="#top"> Back to top</a></div›
+<div align="right"><a href="#top">Back to top</a></div›
   
 ---
 ## 5. The Universal Backtracking Template (Java)

@@ -165,7 +165,7 @@ public class Subsets {
 Notice the **choose + explore + un-choose** rhythm with `add` / `remove` .
 Also note `new ArrayList<>(path)` - we store a **copy**, not the live reference.
 
-<div align="right"><a href="#top">Back to top</a></div›
+<div align="left"><a href="#top">Back to top</a></div›
 
 ---
 
@@ -198,3 +198,41 @@ public class Permutations {
 ```
 
 <div align="left"><a href="#top">Back to top</a></div›
+
+---
+
+## 8. NeetCode 150 Spotlight: Combination Sum
+> **Problem (LeetCode 39):** Given an array of **distinct** integers `candidates`
+> and a `target`, return all **unique** combinations whose numbers sum to
+> `target`. The **same** number may be chosen an **unlimited** number of times.
+
+This is the exact same backtracking machinery as Subsets/Permutations - only the constraints change. Two ideas drive it:
+1. **Pruning by the running total.** Subtract each pick from "remaining". If `remaining == 6` we found a valid combination; if `remaining < o` we overshot and abandon the branch immediately.
+2. **Avoiding duplicate combinations.** Pass a `start` index so each level only considers candidates from the current position onward. Crucially we recurse with `i` (not `i + 1`) so the **same** number can be reused, while still never revisiting earlier numbers (which would produce permuted duplicates like `[2,3]` and `[3,2]`).
+
+```java
+import java.util.*;
+public class CombinationSum {
+     public List‹List<Integer>> combinationSum(int[] candidates, int target) {
+          List‹List<< Integer>> result = new ArrayList<>();
+          backtrack(candidates, target, 0, new ArrayList<>(), result);
+          return result;
+     }
+     private void backtrack(int[] candidates, int remaining, int start, List‹Integer> path, List‹List<Integer>> result) {
+     if (remaining == 0) {  // isSolution: hit the target
+          result.add(new ArrayList>(path));
+          return;
+     }
+     if (remaining < 0) { // pruning: overshot the target
+          return;
+     }
+     for (int i = start; i ‹ candidates.length; i++) {
+          path.add (candidates [i]); // choose
+          // pass "i" (not "i + 1º) so the same number can be reused
+          backtrack(candidates, remaining - candidates[i], i, path, result);
+          path.remove(path.size() - 1); // un-choose (backtrack)
+          }
+     }
+}
+// combinationSum([2,3,6,7], 7) -> [[2,2,3], [7]]
+```

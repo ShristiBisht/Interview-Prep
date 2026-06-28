@@ -425,7 +425,7 @@ import java.util.*;
 ```
 
 ### Just want the count* of solutions?
-***java
+```java
 public class NQueensCount 1
      public int totalNQueens(int n) {
           return backtrack(0, n, new boolean[n],

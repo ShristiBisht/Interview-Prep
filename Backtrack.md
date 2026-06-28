@@ -25,7 +25,9 @@
 14. [Common Pitfalls & Tips (Java-specific)](#14-common-pitfalls--tips-java-specific)
 15. [Practice Problems](#15-practice-problems)
 16. [Cheat Sheet](#16-cheat-sheet)
-- - -
+
+---
+
 ## 1. What Is Backtracking?
 **Backtracking** is a general algorithmic technique for solving problems
 *incrementally*, building candidates to the solution one piece at a time, and
@@ -41,7 +43,7 @@ Use backtracking when a problem asks you to:
 - Satisfy a set of **constraints** (Constraint Satisfaction Problems).
 Typical keywords in problem statements: *"all combinations"*, *"all paths"*,*"generate every"*, *"place items so that..."*, *"is there an arrangement..."*.
 
-‹div align="right"><a href="#top"> Back to top</a></div›
+<div align="left"><a href="#top">Back to top</a></div›
 
 ---
 
@@ -62,7 +64,7 @@ The "walk back and undo" step is the **backtrack**. The crucial optimization is:
        end --> backtrack)
 ```
 
-‹div align="right"><a href="#top"> Back to top</a></div>
+<div align="left"><a href="#top">Back to top</a></div›
 
 ---
 
@@ -77,8 +79,8 @@ The "walk back and undo" step is the **backtrack**. The crucial optimization is:
 **Key insight:** Backtracking = Brute force + **early abandonment** of doomed paths.
 Without pruning, backtracking degrades into plain brute force.
 
-‹div align="right"><a href="#top"> Back to top</a></div>
-
+<div align="left"><a href="#top">Back to top</a></div›
+     
 ---
 
 ## 4. The State-Space Tree
@@ -105,9 +107,10 @@ graph TD
   C --> C1["[3,1]"]
   C --> C2["[3,2]"]
 ```
-<div align="right"><a href="#top">Back to top</a></div›
+<div align="left"><a href="#top">Back to top</a></div›
   
 ---
+
 ## 5. The Universal Backtracking Template (Java)
 
 Almost every backtracking solution fits this shape:
@@ -131,7 +134,10 @@ for (Choice choice : getcandidates(state)) {
 The three magic steps inside the loop - **choose → explore + un-choose** - are the signature of backtracking. The `isValid` check is what keeps it efficient.
 > **Mnemonic:** *Choose, Explore, Un-choose.*
 
-‹div align="right"><a href="#top"> Back to top</a></div›
+<div align="left"><a href="#top">Back to top</a></div›
+
+---
+
 ## 6. Warm-Up Example: Subsets
 Generate all subsets of `[1, 2, 3]`.
 ```java 
@@ -159,4 +165,36 @@ public class Subsets {
 Notice the **choose + explore + un-choose** rhythm with `add` / `remove` .
 Also note `new ArrayList<>(path)` - we store a **copy**, not the live reference.
 
-‹div align="right"><a href="#top"> Back to top</a></div>
+<div align="right"><a href="#top">Back to top</a></div›
+
+---
+
+## 7. Warm-Up Example: Permutations
+Generate all orderings of '[1, 2, 31".
+```java
+import java.util.*;
+public class Permutations {
+     public List‹ List‹Integer›> permute(int[] nums) {
+          List‹List<Integer>> result = new ArrayList<>();
+          boolean[] used = new boolean[nums.length];
+          backtrack(nums, used, new ArrayList>(), result);
+          return result;
+     }
+     private void backtrack(int[] nums, boolean[] used,List‹Integer> path, List<List<Integer>> result) {
+          if (path.size() == nums.length) { // isSolution
+               result.add(new ArrayList>(path)):
+               return;
+          }
+          for (int 1 = 0; i < nums.length; i++) {
+               if (used[i]) continue;  // pruning: skip already-used
+               used [1] = true; // choose
+               path.add(nums [i]);
+               backtrack(nums, used, path, result): // explore
+               path. remove(path.size() - 1); // un-choose
+               used[i] = false;
+          }
+     }
+}
+```
+
+<div align="left"><a href="#top">Back to top</a></div›

@@ -348,3 +348,103 @@ Q...                      ...Q
 ..Q.                      .Q..
 ```
 Continuing this process eventually finds the two valid solutions for *N = 4*:
+This trace shows the essence: ** Try, hit a wall, undo, try the next option**
+
+<div align="left"><a href="#top">Back to top</a></div›
+
+---
+
+## 11. N-Queens: Optimized Java Implementation
+```java
+import java.util.*;
+
+     public class NQueens {
+     private int n;
+     private boolean[] cols; // columns under attack
+     private boolean[] diag1; // "'" diagonals: indexed by (row - col + n - 1)
+     private boolean[] diag2; // "/" diagonals: indexed by (row + col)
+     private int[] placement; // placement[row] = column of the queen in that row
+     private List‹List<String>> solutions;
+     
+     public List<List<String>> solveNQueens(int n) {
+          this.n = n;
+          this.cols = new boolean[n];
+          this.diag1 = new boolean[2 * n - 1];
+          this.diag2 = new boolean[2 * n - 1];
+          this-placement = new int[n]:
+          this solutions = new ArrayListo>0;
+          backtrack(0);
+          return solutions;
+     }
+
+     private void backtrack(int row) {
+          if (row == n) {      // all N queens placed + solution
+               solutions.add(buildBoard()):
+               return;
+          }
+          for (int col = 0; col < n; col++) {
+               int d1 = row - col + n - 1;
+               int d2 = row + col;
+               // --- PRUNING: skip any column under attack ---
+               if (cols[col] || diag1[d1] || diag2[d2]) {
+                    continue;
+               }
+               // shift into [O, 2n-2]
+               //--- CHOOSE ---
+               cols[col] = diag1[d1] = diag2[d2] = true;
+               placement [row] = col;
+               //--- EXPLORE ---
+               backtrack(row + 1);
+               //--- UN-CHOOSE (BACKTRACK) ---
+               cols [col] = diag1[1] = diag2[d2] = false;
+          }     
+     }
+          private List< String> buildBoard() {
+               List<String> board = new ArrayList<>();
+               for (int row = 0; row < n; row++) {
+                    char[] line - new char [n];
+                    Arrays. fill(line, '.');
+                    line [placement [rowl] = '0';
+                    board.add (new String(line));
+               }
+               return board;
+          }
+     //---Demo---
+     public static void main(String[] args){
+          int n=4;
+          List<List<String>> boards = new NQueens().solveNQueens(n);
+          System.out.printf("%d solution(s) for N= %d%n%n", boards.size(),n);
+          int i=1;
+          for (List<String> board : boards){
+               System.out.println("Solution"+(i++)+":");
+               board.forEach(System.out::println);
+               System.out.println();
+          }
+     }
+}
+```
+
+### Just want the count* of solutions?
+***java
+public class NQueensCount 1
+     public int totalNQueens(int n) {
+          return backtrack(0, n, new boolean[n],
+          new boolean[2 *n - 1], new boolean[2 * n - 1]);
+     }
+     private int backtrack(int row, int n, booleanll cols,boolean[] diag1, boolean[] diag2) {
+          if (row == n) return 1;
+          int total = 0;
+          for (int col = 0; col < n; col++) {
+               int d1 = row - col + n - 1;
+               int d2 = row + col;
+               if (cols[col] || diag1[d1] || diag2[d2]) continue;
+               cols[col] = diag1[d1] = diag2[d2] = true;
+               total += backtrack(row + 1, n, cols, diag1, diag?);
+               cols[col] = diag1[d1] = diag2[d2] = false;
+               }
+          return total;
+     }
+}
+
+// new NQueensCount) -totalNQueens (8) -> 92
+```

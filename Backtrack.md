@@ -550,3 +550,41 @@ Work these in roughly increasing difficulty:
 |**N-Queens / N-Queens II** | Multi-constraint pruning |
 |Sudoku Solver | Constraint propagation + backtracking |
 | Restore IP Addresses | Segment validation |
+
+<div align="left"><a href="#top">Back to top</a></div›
+
+---
+
+## 16. Cheat Sheet
+```text
+BACKTRACKING = DFS over the state-space tree + PRUNING
+
+Template (Java):
+     void backtrack(State s) {
+          if (isSolution(s)) { record(s); return; }
+          for (Choice c : candidates (s)) {
+               if (isValid(s, c)) { //  prune here
+                    choose(c);  // mutate state
+                    backtrack(s);  // recurse
+                    unChoose (c); // restore state
+               }
+          }
+     }
+
+Rhythm: CHOOSE + EXPLORE + UN-CHOOSE
+
+N-Queens constraints (all 0(1)):
+     same column : cols[coll
+     "\" diagonal : diag1[row - col + n - 1]
+     "/" diagonal : diag2[row + col]
+
+Place one queen per row + depth = N, branching ≤ N.
+Time: O(N!) worst case (pruning cuts the constant heavily)
+Space: O(N) working memory
+
+Java gotchas:
+     - store new ArrayList<>(path), never the live reference
+     - offset negative diagonal index by (n - 1)
+     - path. remove(path.size() - 1) removes by index, not value
+```
+---

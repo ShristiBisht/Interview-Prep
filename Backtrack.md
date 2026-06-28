@@ -20,11 +20,11 @@
 9. [N-Queens: The Classic Problem](#9-n-queens-the-classic-problem)
 10. [N-Queens: Step-by-Step Walkthrough (4x4)](#10-n-queens-step-by-step-walkthrough-44)
 11. [N-Queens: Optimized Java Implementation](#11-n-queens-optimized-java-implementation)
-12- [Complexity Analysis](#12-complexity-analysis)
-13. [Pruning: The Heart of Efficiency](#13-pruning-the-heart-of-efficiency)
-14. [Common Pitfalls & Tips (Java-specific)](#14-common-pitfalls--tips-java-specific)
-15. [Practice Problems](#15-practice-problems)
-16. [Cheat Sheet](#16-cheat-sheet)
+12. [Complexity Analysis](#12-complexity-analysis)
+14. [Pruning: The Heart of Efficiency](#13-pruning-the-heart-of-efficiency)
+15. [Common Pitfalls & Tips (Java-specific)](#14-common-pitfalls--tips-java-specific)
+16. [Practice Problems](#15-practice-problems)
+17. [Cheat Sheet](#16-cheat-sheet)
 
 ---
 
@@ -478,3 +478,30 @@ public class NQueensBitmask {
      }
 }
 ```
+<div align="left"><a href="#top">Back to top</a></div›
+
+---
+     
+## 12. Complexity Analysis
+### Time complexity
+- **Upper bound (no pruning):** *O(N"N) - N choices at each of N rows.
+- **With the one-queen-per-row constraint:** "O(N!) - first row has N options, next has ≤ N-1, and so on.
+**With diagonal pruning:** Far fewer nodes are actually wisited in practice, though the worst-case bound stays "O(N!)*. Pruning provides a large *constant factor* (and often more) speedup.
+| N | Number of solutions |
+|---|---|
+|1 |1|
+|4|2|
+|6|4|
+|8|92 |
+| 10 | 724 |
+| 12 | 14,200 |
+
+### Space complexity
+- **Recursion depth:** `O(N)` (one stack frame per row).
+- **Auxiliary arrays:** `O(N)` total across `cols`, `diagl`, `diag2`, `placement`.
+- **Output:** `O(number_of_solutions * N)` to store all boards.
+So the working space (excluding output) is **`O(N)`**.
+
+<div align="left"><a href="#top">Back to top</a></div›
+
+---

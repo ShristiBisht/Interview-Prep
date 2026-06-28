@@ -487,6 +487,7 @@ public class NQueensBitmask {
 - **Upper bound (no pruning):** *O(N"N) - N choices at each of N rows.
 - **With the one-queen-per-row constraint:** "O(N!) - first row has N options, next has ≤ N-1, and so on.
 **With diagonal pruning:** Far fewer nodes are actually wisited in practice, though the worst-case bound stays "O(N!)*. Pruning provides a large *constant factor* (and often more) speedup.
+  
 | N | Number of solutions |
 |---|---|
 |1 |1|
@@ -505,3 +506,47 @@ So the working space (excluding output) is **`O(N)`**.
 <div align="left"><a href="#top">Back to top</a></div›
 
 ---
+
+## 13. Pruning: The Heart of Efficiency
+Pruning is what separates backtracking from naive brute force. The earlier and more aggressively you can reject invalid partial solutions, the smaller the state-space tree you actually explore.
+**Good pruning checklist:**
+1. **Validate at every step**, not just at the leaves.
+     - X Place all N queens, *then* check validity → brute force.
+     - Check each queen against prior ones *before* recursing --> backtracking.
+2. **Use O(1) constraint checks** (`boolean[]` / bitmasks) instead of rescanning the whole board.
+3. **Order choices smartly** when looking for *one* solution - try the most constrained options first (a heuristic from Constraint Satisfaction Problems, e-g-, *Minimum Remaining Values*).
+4. **Exploit symmetry** - e.g., for N-Queens you can fix the first queen to the left half of row 0 and mirror results to roughly halve the work.
+
+<div align="left"><a href="#top">Back to top</a></div›
+     
+ーーー
+
+## 14. Common Pitfalls & Tips (Java-specific)
+- **Forgetting to un-choose.** If you mutate shared state (a `List`, a `boolean[]`, a board) you *must* undo it after the recursive call, or sibling branches see corrupted state.
+- **Storing a reference instead of a copy.** When recording a solution from a mutable `path`, store `new ArrayList<>(path)`, not `path` itself - otherwise
+later mutations corrupt your saved results. This is the single most common Java backtracking bug.
+- **Negative diagonal indices.** `row - col` ranges from `-(N-1)` to `N-1`. With arrays you **must** offset by `N - 1`; forgetting this throws `ArrayIndexOutOfBoundsException`.
+- **`List.remove(int)` vs 'List.remove(Object)`.** `path. remove(path.size() - 1)` removes by **index** (correct for backtracking). Be careful with `List<Integer>`: `path.remove(someInteger)` may call the *object* overload and remove by value instead.
+- **Pruning too late.** Checking validity only at leaves throws away the whole benefit of backtracking.
+- **Returning early when you need *all* solutions,** Use `return true` to stop at the first solution; keep iterating (no early return) to collect them all.
+- **`StackOverflowError` for huge N.** The JVM default stack handles N-Queens fine, but very deep custom recursion may need `-Xss` tuning or an explicit stack.
+
+<div align="left"><a href="#top">Back to top</a></div›
+
+---
+
+## 15. Practice Problems
+Work these in roughly increasing difficulty:
+
+| Problem | Concept reinforced |
+|---|---|
+| Subsets / Subsets II | Include-exclude tree, dedup | 
+| Permutations / Permutations II | Used-tracking, dedup | 
+| Combination Sum I/II/III | Choice reuse, target pruning | 
+|Letter Combinations of a Phone Number | Mapping choices | 
+|Generate Parentheses | Constraint-driven pruning |
+| Word Search | Grid DFS + visited backtracking |
+| Palindrome Partitioning | Substring choices |
+|**N-Queens / N-Queens II** | Multi-constraint pruning |
+|Sudoku Solver | Constraint propagation + backtracking |
+| Restore IP Addresses | Segment validation |

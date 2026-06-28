@@ -236,3 +236,44 @@ public class CombinationSum {
 }
 // combinationSum([2,3,6,7], 7) -> [[2,2,3], [7]]
 ```
+
+### How it maps to the template
+| Template step | Combination Sum |
+|---|---|
+|`isSolution` | `remaining == 0` |
+| Pruning | `remaining ‹ 0` (overshoot) + `start` index (no duplicates) |
+| Choose | `path.add(candidates[i])` |
+| Explore | recurse with `remaining - candidates[i]`, same `i` for reuse I |
+| Un-choose | `path.remove(path.size() - 1)` |
+
+Notice the identical **choose + explore + un-choose** rhythm, and again we store
+`new ArrayList<>(path)` - a **copy**, never the live reference.
+**Tiny tweak + a different problem.** Recurse with `i + 1` instead of `i` and
+> you get **Combination Sum II** (each number used at most once). Add a sort plus
+> a `if (i > start && candidates[i] == candidates[i-1]) continue;` skip and it
+> handles duplicate inputs too. Same skeleton, new constraints.
+
+<div align="left"><a href="#top">Back to top</a></div›
+
+---
+
+## 9. N-Queens: The Classic Problem
+> **Problem:** Place "N° queens on an "N*N" chessboard so that **no two queens
+> attack each other**. A queen attacks along its **row**, **Column**, and both
+> **diagonals**. Return all distinct valid placements.
+
+### Why it's a perfect backtracking problem
+- We build the solution **one row at a time** (place exactly one queen per row).
+- At each row, we **try every column**
+- We **prune** any column that is attacked by a previously placed queen.
+- If no column works in a row, we **backtrack** to the previous row and move its queen.
+  
+### Key observation that shrinks the problem
+Since two queens can never share a row, we place **exactly one queen in each row**.
+This reduces the search from "choose N squares out of N2" to "choose one column for each of the N rows" - a state-space tree of depth `N` with up to `N` branches per node.
+
+### Detecting attacks in 0(1)
+For a queen at `(row, col)`:
+- **Same column:** another queen has the same `col`.
+- **Same \ diagonal (top-left + bottom-right):** cells where `row - col` is equal.
+- **Same / diagonal (top-right - bottom-left):** cells where `row + col` is equal.

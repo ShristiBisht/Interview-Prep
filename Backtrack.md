@@ -277,3 +277,74 @@ For a queen at `(row, col)`:
 - **Same column:** another queen has the same `col`.
 - **Same \ diagonal (top-left + bottom-right):** cells where `row - col` is equal.
 - **Same / diagonal (top-right - bottom-left):** cells where `row + col` is equal.
+
+So we maintain three tracking structures:
+
+| Structure | Tracks | Identity |
+|---|---|---|
+| `cols` | occupied columns | `col` |
+| `diag1` | "\" diagonals | `row - col` | 
+| `diag2` | "/" diagonals | `row + col` |
+A column is safe iff `col` is not in `cols` **and** `(row - col)` is not in `diag1`
+**and**`(row + col)` is not in `diag2`. Each check is 0(1).
+**Java note:** `row - col` can be negative (range `-(N-1)` to `N-1`). If you
+> use boolean arrays instead of a `HashSet`, offset the index by `N - 1`, i.e.
+> `diag1[row - col + (N - 1)]`. The example below uses `boolean[]` for speed.
+
+<div align="left"><a href="#top">Back to top</a></div›
+
+---
+
+## 10. N-Queens: Step-by-Step Walkthrough (4×4)
+Let's trace `N = 4`. We place one queen per row, columns indexed `0-3`.
+
+**Row 0:** try col 0. Place `Q` at (0,0).
+```
+Q...
+....
+....
+....
+```
+**Row 1:** col 0 X (same column), col 1 X (diagonal of (0,0)), col 2 V. Place (1,2).
+```
+Q...
+..Q.
+....
+....
+```
+**Row 2:** col @ X (column), col 1 X (diag of (1,2)), col 2 X (column), col 3 X (diag of (1,2)). **Dead end --> backtrack to row 1.**
+**Row 1 again:** try col 3 (next after 2). Place (1,3) .
+```
+Q...
+...Q
+....
+....
+```
+**Row 2:** col 0 X, col 1 V. Place (2,1) -
+```
+Q...
+...Q
+.Q..
+....
+```
+
+**Row 3:** col 0 X, col 1 X, col 2 X, col 3 X. **Dead end → backtrack**.
+Row 2 has no more options --> backtrack to row 1 exhausted --> backtrack to row 0.
+**Row 0 again:** try col 1. Place (0,1).
+```
+.Q..
+....
+....
+....
+```
+
+Conitnuing this process evenutally finds the two valid solutions for `N=4`.
+
+```
+Solution 1                Solution 2
+.Q..                      ..Q.
+...Q                      Q...
+Q...                      ...Q
+..Q.                      .Q..
+```
+Continuing this process eventually finds the two valid solutions for *N = 4*:

@@ -285,9 +285,7 @@ So we maintain three tracking structures:
 | `cols` | occupied columns | `col` |
 | `diag1` | "\" diagonals | `row - col` | 
 | `diag2` | "/" diagonals | `row + col` |
-A column is safe iff `col` is not in `cols` **and** `(row - col)` is not in `diag1`
-**and**`(row + col)` is not in `diag2`. Each check is 0(1).
-**Java note:** `row - col` can be negative (range `-(N-1)` to `N-1`). If you
+> A column is safe iff `col` is not in `cols` **and** `(row - col)` is not in `diag1` **and**`(row + col)` is not in `diag2`. Each check is 0(1). **Java note:** `row - col` can be negative (range `-(N-1)` to `N-1`). If you
 > use boolean arrays instead of a `HashSet`, offset the index by `N - 1`, i.e.
 > `diag1[row - col + (N - 1)]`. The example below uses `boolean[]` for speed.
 

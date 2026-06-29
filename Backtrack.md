@@ -312,7 +312,7 @@ Q...
 ....
 ....
 ```
-**Row 2:** col @ X (column), col 1 X (diag of (1,2)), col 2 X (column), col 3 X (diag of (1,2)). **Dead end --> backtrack to row 1.**
+**Row 2:** col 0 X (column), col 1 X (diag of (1,2)), col 2 X (column), col 3 X (diag of (1,2)). **Dead end --> backtrack to row 1.**
 **Row 1 again:** try col 3 (next after 2). Place (1,3) .
 ```
 Q...
@@ -484,8 +484,8 @@ public class NQueensBitmask {
      
 ## 12. Complexity Analysis
 ### Time complexity
-- **Upper bound (no pruning):** *O(N"N) - N choices at each of N rows.
-- **With the one-queen-per-row constraint:** "O(N!) - first row has N options, next has ≤ N-1, and so on.
+- **Upper bound (no pruning):** `O(N*N)` - N choices at each of N rows.
+- **With the one-queen-per-row constraint:** `O(N!)` - first row has N options, next has ≤ N-1, and so on.
 **With diagonal pruning:** Far fewer nodes are actually wisited in practice, though the worst-case bound stays "O(N!)*. Pruning provides a large *constant factor* (and often more) speedup.
   
 | N | Number of solutions |

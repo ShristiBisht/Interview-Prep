@@ -228,7 +228,7 @@ public class CombinationSum {
      }
      for (int i = start; i ‹ candidates.length; i++) {
           path.add (candidates [i]); // choose
-          // pass "i" (not "i + 1º) so the same number can be reused
+          // pass `i` (not `i + 1`) so the same number can be reused
           backtrack(candidates, remaining - candidates[i], i, path, result);
           path.remove(path.size() - 1); // un-choose (backtrack)
           }
@@ -258,7 +258,7 @@ Notice the identical **choose + explore + un-choose** rhythm, and again we store
 ---
 
 ## 9. N-Queens: The Classic Problem
-> **Problem:** Place "N° queens on an "N*N" chessboard so that **no two queens
+> **Problem:** Place `N` queens on an `N*N` chessboard so that **no two queens
 > attack each other**. A queen attacks along its **row**, **Column**, and both
 > **diagonals**. Return all distinct valid placements.
 

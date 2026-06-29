@@ -170,7 +170,7 @@ Also note `new ArrayList<>(path)` - we store a **copy**, not the live reference.
 ---
 
 ## 7. Warm-Up Example: Permutations
-Generate all orderings of '[1, 2, 31".
+Generate all orderings of `[1, 2, 3]`.
 ```java
 import java.util.*;
 public class Permutations {

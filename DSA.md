@@ -488,8 +488,8 @@ Pruning is what separates backtracking from naive brute force. The earlier and m
 4. **Exploit symmetry** - e.g., for N-Queens you can fix the first queen to the left half of row 0 and mirror results to roughly halve the work.
 
 <div align="left"><a href="#top">Back to top</a></div›
-     
-ーーー
+
+---
 
 ## 14. Common Pitfalls & Tips (Java-specific)
 - **Forgetting to un-choose.** If you mutate shared state (a `List`, a `boolean[]`, a board) you *must* undo it after the recursive call, or sibling branches see corrupted state.

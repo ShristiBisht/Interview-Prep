@@ -16,14 +16,13 @@
 5. [Subsets](#5-subsets)
 6. [Permutations](#6-permutations)
 7. [Combination Sum](#7-combination-sum)
-8. [N-Queens: The Classic Problem](#9-n-queens-the-classic-problem)
-9. [N-Queens: Step-by-Step Walkthrough (4x4)](#10-n-queens-step-by-step-walkthrough-44)
-10. [N-Queens: Optimized Java Implementation](#11-n-queens-optimized-java-implementation)
-11. [Complexity Analysis](#12-complexity-analysis)
-12. [Pruning: The Heart of Efficiency](#13-pruning-the-heart-of-efficiency)
-13. [Common Pitfalls & Tips (Java-specific)](#14-common-pitfalls--tips-java-specific)
-14. [Practice Problems](#15-practice-problems)
-15. [Cheat Sheet](#16-cheat-sheet)
+8. [N-Queens: The Classic Problem](#8-n-queens-the-classic-problem)
+9. [N-Queens: Step-by-Step Walkthrough (4x4)](#9-n-queens-step-by-step-walkthrough-44)
+10. [N-Queens: Optimized Java Implementation](#10-n-queens-optimized-java-implementation)
+11. [Complexity Analysis](#11-complexity-analysis)
+12. [Pruning: The Heart of Efficiency](#12-pruning-the-heart-of-efficiency)
+13. [Practice Problems](#13-practice-problems)
+14. [Cheat Sheet](#14-cheat-sheet)
 
 ---
 
@@ -229,7 +228,7 @@ Notice the identical **choose + explore + un-choose** rhythm, and again we store
 
 ---
 
-## 9. N-Queens: The Classic Problem
+## 8. N-Queens: The Classic Problem
 > **Problem:** Place `N` queens on an `N*N` chessboard so that **no two queens
 > attack each other**. A queen attacks along its **row**, **Column**, and both
 > **diagonals**. Return all distinct valid placements.
@@ -265,7 +264,7 @@ So we maintain three tracking structures:
 
 ---
 
-## 10. N-Queens: Step-by-Step Walkthrough (4×4)
+## 9. N-Queens: Step-by-Step Walkthrough (4×4)
 Let's trace `N = 4`. We place one queen per row, columns indexed `0-3`.
 
 **Row 0:** try col 0. Place `Q` at (0,0).
@@ -324,7 +323,7 @@ This trace shows the essence: ** Try, hit a wall, undo, try the next option**
 
 ---
 
-## 11. N-Queens: Optimized Java Implementation
+## 10. N-Queens: Optimized Java Implementation
 ```java
 import java.util.*;
 
@@ -452,7 +451,7 @@ public class NQueensBitmask {
 
 ---
      
-## 12. Complexity Analysis
+## 11. Complexity Analysis
 ### Time complexity
 - **Upper bound (no pruning):** `O(N*N)` - N choices at each of N rows.
 - **With the one-queen-per-row constraint:** `O(N!)` - first row has N options, next has ≤ N-1, and so on.
@@ -477,7 +476,7 @@ So the working space (excluding output) is **`O(N)`**.
 
 ---
 
-## 13. Pruning: The Heart of Efficiency
+## 12. Pruning: The Heart of Efficiency
 Pruning is what separates backtracking from naive brute force. The earlier and more aggressively you can reject invalid partial solutions, the smaller the state-space tree you actually explore.
 **Good pruning checklist:**
 1. **Validate at every step**, not just at the leaves.
@@ -491,21 +490,7 @@ Pruning is what separates backtracking from naive brute force. The earlier and m
 
 ---
 
-## 14. Common Pitfalls & Tips (Java-specific)
-- **Forgetting to un-choose.** If you mutate shared state (a `List`, a `boolean[]`, a board) you *must* undo it after the recursive call, or sibling branches see corrupted state.
-- **Storing a reference instead of a copy.** When recording a solution from a mutable `path`, store `new ArrayList<>(path)`, not `path` itself - otherwise
-later mutations corrupt your saved results. This is the single most common Java backtracking bug.
-- **Negative diagonal indices.** `row - col` ranges from `-(N-1)` to `N-1`. With arrays you **must** offset by `N - 1`; forgetting this throws `ArrayIndexOutOfBoundsException`.
-- **`List.remove(int)` vs 'List.remove(Object)`.** `path. remove(path.size() - 1)` removes by **index** (correct for backtracking). Be careful with `List<Integer>`: `path.remove(someInteger)` may call the *object* overload and remove by value instead.
-- **Pruning too late.** Checking validity only at leaves throws away the whole benefit of backtracking.
-- **Returning early when you need *all* solutions,** Use `return true` to stop at the first solution; keep iterating (no early return) to collect them all.
-- **`StackOverflowError` for huge N.** The JVM default stack handles N-Queens fine, but very deep custom recursion may need `-Xss` tuning or an explicit stack.
-
-<div align="left"><a href="#top">Back to top</a></div›
-
----
-
-## 15. Practice Problems
+## 13. Practice Problems
 Work these in roughly increasing difficulty:
 
 | Problem | Concept reinforced |
@@ -525,7 +510,7 @@ Work these in roughly increasing difficulty:
 
 ---
 
-## 16. Cheat Sheet
+## 14. Cheat Sheet
 ```text
 BACKTRACKING = DFS over the state-space tree + PRUNING
 

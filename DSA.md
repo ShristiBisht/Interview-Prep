@@ -10,18 +10,17 @@
 ## Table of Contents
 
 1. [What- Is Backtracking?](#1-what-is-backtracking)
-2. [The Core Idea (Intuition)](#2-the-core-idea-intuition)
-3. [Backtracking vs. Brute Force vs. DP](#3-backtracking-vs-brute-force-vs-dp)
-4. [The Universal Backtracking Template (Java)](#4-the-universal-backtracking-template-java)
-5. [Subsets](#5-subsets)
-6. [Permutations](#6-permutations)
-7. [Combination Sum](#7-combination-sum)
-8. [N-Queens: The Classic Problem](#8-n-queens-the-classic-problem)
-9. [N-Queens: Step-by-Step Walkthrough (4x4)](#9-n-queens-step-by-step-walkthrough-44)
-10. [N-Queens: Optimized Java Implementation](#10-n-queens-optimized-java-implementation)
-11. [Complexity Analysis](#11-complexity-analysis)
-12. [Practice Problems](#12-practice-problems)
-13. [Cheat Sheet](#13-cheat-sheet)
+2. [Backtracking vs. Brute Force vs. DP](#2-backtracking-vs-brute-force-vs-dp)
+3. [The Universal Backtracking Template (Java)](#3-the-universal-backtracking-template-java)
+4. [Subsets](#4-subsets)
+5. [Permutations](#5-permutations)
+6. [Combination Sum](#6-combination-sum)
+7. [N-Queens: The Classic Problem](#7-n-queens-the-classic-problem)
+8. [N-Queens: Step-by-Step Walkthrough (4x4)](#8-n-queens-step-by-step-walkthrough-44)
+9. [N-Queens: Optimized Java Implementation](#9-n-queens-optimized-java-implementation)
+10. [Complexity Analysis](#10-complexity-analysis)
+11. [Practice Problems](#11-practice-problems)
+12. [Cheat Sheet](#12-cheat-sheet)
 
 ---
 
@@ -44,28 +43,7 @@ Typical keywords in problem statements: *"all combinations"*, *"all paths"*,*"ge
 
 ---
 
-## 2. The Core Idea (Intuition)
-Imagine you're navigating a maze. At each junction you:
-1. **Pick** a direction (make a choice).
-2. **Walk** forward (recurse / go deeper).
-3. If you hit a dead end, **walk back** to the last junction (undo the choice).
-4. Try the **next** unexplored direction.
-5. Repeat until you escape (solution found) or exhaust all paths (no solution).
-The "walk back and undo" step is the **backtrack**. The crucial optimization is: if you can *tell early* that a path leads nowhere, you don't waste time walking all the way down it. That early detection is called **pruning**.
-``` 
-     start
-    /  |  \
-   A   B   C  <-- choices at level 1
-  /|   |   |
-  ... (dead...
-       end --> backtrack)
-```
-
-<div align="left"><a href="#top">Back to top</a></div›
-
----
-
-## 3. Backtracking vs. Brute Force vs. DP
+## 2. Backtracking vs. Brute Force vs. DP
 | Aspect | Brute Force | Backtracking | Dynamic Programming |
 |---|---|---|---|
 | Strategy | Generate *all* candidates, then test | Build incrementally, **prune** invalid early | Reuse overlapping subproblem results |
@@ -81,7 +59,7 @@ Without pruning, backtracking degrades into plain brute force.
 ---
 
 
-## 4. The Universal Backtracking Template (Java)
+## 3. The Universal Backtracking Template (Java)
 
 Almost every backtracking solution fits this shape:
 ```java
@@ -108,7 +86,7 @@ The three magic steps inside the loop - **choose → explore + un-choose** - are
 
 ---
 
-## 5. Subsets
+## 4. Subsets
 Generate all subsets of `[1, 2, 3]`.
 ```java 
 import java.util.*;
@@ -139,7 +117,7 @@ Also note `new ArrayList<>(path)` - we store a **copy**, not the live reference.
 
 ---
 
-## 6. Permutations
+## 5. Permutations
 Generate all orderings of `[1, 2, 3]`.
 ```java
 import java.util.*;
@@ -171,7 +149,7 @@ public class Permutations {
 
 ---
 
-## 7. Combination Sum
+## 6. Combination Sum
 > **Problem (LeetCode 39):** Given an array of **distinct** integers `candidates`
 > and a `target`, return all **unique** combinations whose numbers sum to
 > `target`. The **same** number may be chosen an **unlimited** number of times.
@@ -227,7 +205,7 @@ Notice the identical **choose + explore + un-choose** rhythm, and again we store
 
 ---
 
-## 8. N-Queens: The Classic Problem
+## 7. N-Queens: The Classic Problem
 > **Problem:** Place `N` queens on an `N*N` chessboard so that **no two queens
 > attack each other**. A queen attacks along its **row**, **Column**, and both
 > **diagonals**. Return all distinct valid placements.
@@ -263,7 +241,7 @@ So we maintain three tracking structures:
 
 ---
 
-## 9. N-Queens: Step-by-Step Walkthrough (4×4)
+## 8. N-Queens: Step-by-Step Walkthrough (4×4)
 Let's trace `N = 4`. We place one queen per row, columns indexed `0-3`.
 
 **Row 0:** try col 0. Place `Q` at (0,0).
@@ -322,7 +300,7 @@ This trace shows the essence: ** Try, hit a wall, undo, try the next option**
 
 ---
 
-## 10. N-Queens: Optimized Java Implementation
+## 9. N-Queens: Optimized Java Implementation
 ```java
 import java.util.*;
 
@@ -450,7 +428,7 @@ public class NQueensBitmask {
 
 ---
      
-## 11. Complexity Analysis
+## 10. Complexity Analysis
 ### Time complexity
 - **Upper bound (no pruning):** `O(N*N)` - N choices at each of N rows.
 - **With the one-queen-per-row constraint:** `O(N!)` - first row has N options, next has ≤ N-1, and so on.
@@ -475,7 +453,7 @@ So the working space (excluding output) is **`O(N)`**.
 
 ---
 
-## 12. Practice Problems
+## 11. Practice Problems
 Work these in roughly increasing difficulty:
 
 | Problem | Concept reinforced |
@@ -495,7 +473,7 @@ Work these in roughly increasing difficulty:
 
 ---
 
-## 13. Cheat Sheet
+## 12. Cheat Sheet
 ```text
 BACKTRACKING = DFS over the state-space tree + PRUNING
 

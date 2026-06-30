@@ -12,19 +12,18 @@
 1. [What- Is Backtracking?](#1-what-is-backtracking)
 2. [The Core Idea (Intuition)](#2-the-core-idea-intuition)
 3. [Backtracking vs. Brute Force vs. DP](#3-backtracking-vs-brute-force-vs-dp)
-4. [The State-Space Tree](#4-the-state-space-tree)
-5. [The Universal Backtracking Template (Java)](#5-the-universal-backtracking-template-java)
-6. [Warm-Up Example: Subsets](#6-warm-up-example-subsets)
-7. [Warm-Up Example: Permutations](#7-warm-up-example-permutations)
-8. [NeetCode 150 Spotlight: Combination Sum](#8-neetcode-156-spotlight-combination-sum)
-9. [N-Queens: The Classic Problem](#9-n-queens-the-classic-problem)
-10. [N-Queens: Step-by-Step Walkthrough (4x4)](#10-n-queens-step-by-step-walkthrough-44)
-11. [N-Queens: Optimized Java Implementation](#11-n-queens-optimized-java-implementation)
-12. [Complexity Analysis](#12-complexity-analysis)
-14. [Pruning: The Heart of Efficiency](#13-pruning-the-heart-of-efficiency)
-15. [Common Pitfalls & Tips (Java-specific)](#14-common-pitfalls--tips-java-specific)
-16. [Practice Problems](#15-practice-problems)
-17. [Cheat Sheet](#16-cheat-sheet)
+4. [The Universal Backtracking Template (Java)](#5-the-universal-backtracking-template-java)
+5. [Subsets](#6-warm-up-example-subsets)
+6. [Permutations](#7-warm-up-example-permutations)
+7. [Combination Sum](#8-neetcode-156-spotlight-combination-sum)
+8. [N-Queens: The Classic Problem](#9-n-queens-the-classic-problem)
+9. [N-Queens: Step-by-Step Walkthrough (4x4)](#10-n-queens-step-by-step-walkthrough-44)
+10. [N-Queens: Optimized Java Implementation](#11-n-queens-optimized-java-implementation)
+11. [Complexity Analysis](#12-complexity-analysis)
+12. [Pruning: The Heart of Efficiency](#13-pruning-the-heart-of-efficiency)
+13. [Common Pitfalls & Tips (Java-specific)](#14-common-pitfalls--tips-java-specific)
+14. [Practice Problems](#15-practice-problems)
+15. [Cheat Sheet](#16-cheat-sheet)
 
 ---
 
@@ -83,33 +82,6 @@ Without pruning, backtracking degrades into plain brute force.
      
 ---
 
-## 4. The State-Space Tree
-Every backtracking problem can be visualized as a tree:
-- **Root** = empty / initial partial solution.
-- **Edges** = a single choice (e.g., "place queen in column 3").
-- **Nodes** = partial solutions (states) .
-- **Leaves** = either complete solutions or dead ends.
-  
-Backtracking is a **DFS traversal** of this tree where we:
-
-- **Descend** when a partial solution is still *promising*.
-- **Prune** (cut the subtree) when a partial solution is *invalid*.
-- **Record** when we reach a *complete valid* solution (leaf).
-```mermaid
-graph TD
-  Root["[] (empty)"] --> A["[1]"]
-  Root --> B["[2]"]
-  Root --> C["[3]"]
-  A --> A1["[1,2]"]
-  A --> A2["[1,3]"]
-  B --> B1["[2,1]"]
-  B --> B2["[2,3]"]
-  C --> C1["[3,1]"]
-  C --> C2["[3,2]"]
-```
-<div align="left"><a href="#top">Back to top</a></div›
-  
----
 
 ## 5. The Universal Backtracking Template (Java)
 

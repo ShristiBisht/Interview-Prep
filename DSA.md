@@ -12,10 +12,10 @@
 1. [What- Is Backtracking?](#1-what-is-backtracking)
 2. [The Core Idea (Intuition)](#2-the-core-idea-intuition)
 3. [Backtracking vs. Brute Force vs. DP](#3-backtracking-vs-brute-force-vs-dp)
-4. [The Universal Backtracking Template (Java)](#5-the-universal-backtracking-template-java)
-5. [Subsets](#6-warm-up-example-subsets)
-6. [Permutations](#7-warm-up-example-permutations)
-7. [Combination Sum](#8-neetcode-156-spotlight-combination-sum)
+4. [The Universal Backtracking Template (Java)](#4-the-universal-backtracking-template-java)
+5. [Subsets](#5-subsets)
+6. [Permutations](#6-permutations)
+7. [Combination Sum](#7-combination-sum)
 8. [N-Queens: The Classic Problem](#9-n-queens-the-classic-problem)
 9. [N-Queens: Step-by-Step Walkthrough (4x4)](#10-n-queens-step-by-step-walkthrough-44)
 10. [N-Queens: Optimized Java Implementation](#11-n-queens-optimized-java-implementation)
@@ -83,7 +83,7 @@ Without pruning, backtracking degrades into plain brute force.
 ---
 
 
-## 5. The Universal Backtracking Template (Java)
+## 4. The Universal Backtracking Template (Java)
 
 Almost every backtracking solution fits this shape:
 ```java
@@ -110,7 +110,7 @@ The three magic steps inside the loop - **choose → explore + un-choose** - are
 
 ---
 
-## 6. Warm-Up Example: Subsets
+## 5. Subsets
 Generate all subsets of `[1, 2, 3]`.
 ```java 
 import java.util.*;
@@ -141,7 +141,7 @@ Also note `new ArrayList<>(path)` - we store a **copy**, not the live reference.
 
 ---
 
-## 7. Warm-Up Example: Permutations
+## 6. Permutations
 Generate all orderings of `[1, 2, 3]`.
 ```java
 import java.util.*;
@@ -173,7 +173,7 @@ public class Permutations {
 
 ---
 
-## 8. NeetCode 150 Spotlight: Combination Sum
+## 7. Combination Sum
 > **Problem (LeetCode 39):** Given an array of **distinct** integers `candidates`
 > and a `target`, return all **unique** combinations whose numbers sum to
 > `target`. The **same** number may be chosen an **unlimited** number of times.

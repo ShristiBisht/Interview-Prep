@@ -20,9 +20,8 @@
 9. [N-Queens: Step-by-Step Walkthrough (4x4)](#9-n-queens-step-by-step-walkthrough-44)
 10. [N-Queens: Optimized Java Implementation](#10-n-queens-optimized-java-implementation)
 11. [Complexity Analysis](#11-complexity-analysis)
-12. [Pruning: The Heart of Efficiency](#12-pruning-the-heart-of-efficiency)
-13. [Practice Problems](#13-practice-problems)
-14. [Cheat Sheet](#14-cheat-sheet)
+12. [Practice Problems](#12-practice-problems)
+13. [Cheat Sheet](#13-cheat-sheet)
 
 ---
 
@@ -476,21 +475,7 @@ So the working space (excluding output) is **`O(N)`**.
 
 ---
 
-## 12. Pruning: The Heart of Efficiency
-Pruning is what separates backtracking from naive brute force. The earlier and more aggressively you can reject invalid partial solutions, the smaller the state-space tree you actually explore.
-**Good pruning checklist:**
-1. **Validate at every step**, not just at the leaves.
-     - X Place all N queens, *then* check validity → brute force.
-     - Check each queen against prior ones *before* recursing --> backtracking.
-2. **Use O(1) constraint checks** (`boolean[]` / bitmasks) instead of rescanning the whole board.
-3. **Order choices smartly** when looking for *one* solution - try the most constrained options first (a heuristic from Constraint Satisfaction Problems, e-g-, *Minimum Remaining Values*).
-4. **Exploit symmetry** - e.g., for N-Queens you can fix the first queen to the left half of row 0 and mirror results to roughly halve the work.
-
-<div align="left"><a href="#top">Back to top</a></div›
-
----
-
-## 13. Practice Problems
+## 12. Practice Problems
 Work these in roughly increasing difficulty:
 
 | Problem | Concept reinforced |
@@ -510,7 +495,7 @@ Work these in roughly increasing difficulty:
 
 ---
 
-## 14. Cheat Sheet
+## 13. Cheat Sheet
 ```text
 BACKTRACKING = DFS over the state-space tree + PRUNING
 

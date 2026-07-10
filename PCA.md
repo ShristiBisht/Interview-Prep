@@ -14,6 +14,7 @@ Imagine you photograph a **teapot** sitting on a table. The teapot is a 3-D obje
 informative) as possible, and to drop the boring angles where nothing much varies.
 
 **Physical significance in one line:** *variance = information*. Directions where the data varies a lot carry the signal; directions where it barely varies are (often) noise or redundancy, and can be dropped.
+
 Another everyday example: measuring people's **height in cm** *and* **height in inches**. These two columns are basically the same information twice. PCA would notice they move together perfectly, collapse them into **one** direction ("size"), and report that the second direction carries ~0 variance (it's redundant).
 
 #### 3. The core vocabulary (plain English first)

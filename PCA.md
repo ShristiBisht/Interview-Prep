@@ -54,19 +54,22 @@ $$z = \frac{x - \mul(\sigma}$$
 where $\mu$ is the column's mean and $\sigma$ is its standard deviation. Now every feature is on an equal footing and PCA compares *patterns*, not *units*. (Skipping this is the single most common PCA mistake.)
 #### 6. The math, step by step (no fear - we go slowly)
 PCA has exactly **five** mathematical steps. We'll define every term.
+
 **Step 1 - Center (and usually standardize) the data.**
 Subtract each column's mean so the cloud is centered on the origin. (Standardize too, per Section 5.) Call the result $X$ - a matrix with $n$ rows (samples) and $d$ columns (features).
+
 **Step 2 - Build the covariance matrix.**
-The «*covariance matrix** $C$ is a $d \times d$ table that measures how every pair of features moves together:
-$SC = \Frac{1H(n-1} X^|top X$$
+The **covariance matrix** $C$ is a $d \times d$ table that measures how every pair of features moves together:
+$$C = \frac{1}(n-1} X^|top X$$
 - The **diagonal"* entries are each feature's **variance** (how much it spreads on its own).
 - The **off-diagonal** entries are **covariances** (how two features move together).
 - It's **symmetric** (the covariance of A with B equals B with A) .
+  
 **Step 3 - Find the eigenvectors and eigenvalues of $C$.**
 This is the magic step. For the covariance matrix, we solve:
-#$C \mathbf{v} = 1lambda \mathbf{v}$$
-Read aloud: *"applying the covariance matrix $C$ to the special direction $mathbf{v$ just stretches it by the number $Lambdas, without rotating it."*
-- Each **eigenvector** $\mathbf{v)$ is a **principal-component direction** (a new axis).
+$$C \mathbf{v} = \lambda \mathbf{v}$$
+Read aloud: *"applying the covariance matrix $C$ to the special direction $mathbf{v$ just stretches it by the number $\Lambda$, without rotating it."*
+- Each **eigenvector** $\mathbf{v}$ is a **principal-component direction** (a new axis).
 - Each **eigenvalue** $\lambda$ says **how much variance** lies along that direction.
 - A $d$-feature dataset gives $d$ eigenvector/eigenvalue pairs, and the eigenvectors are all mutually **perpendicular (orthogonal)** - that's why the new axes are at right angles.
 **Step 4 - Sort by eigenvalue, biggest first.**

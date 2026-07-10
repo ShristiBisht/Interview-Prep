@@ -120,3 +120,37 @@ Three standard ways to choose $k$:
   # smallest k reaching 95%
   print(f"Keep {k} components to retain 95% of variance")
 ```
+#### 9. The code, done properly
+```Python
+  from sklearn-preprocessing import StandardScaler
+  from sklearn.decomposition import PCA
+  from sklearn pipeline import make_pipeline
+  # 1) ALWAYS scale first, and put it in a pipeline so scaling is
+  # learned on train data only (prevents data leakage).
+  pipe = make_pipeline(StandardScaler(), PCA(n_components=2))
+  X_2d = pipe.fit_transform(X_train) # compressed to 2 columns
+  X_test_2d = pipe.transform(X_test)   # reuse the SAME Fit
+  pca = pipe. named_steps["pca"]
+  print(pca.explained _variance_ratio_) # e-g- [0.72, 0.19] -> 91% total
+  print(pca.components_) # the loadings (recipes of PC1, PC2)
+```
+
+
+- `explained_variance_ratio_` + how much information each PC keeps.
+- `components_` → the **loadings**: how each original feature contributes to each PC (great for interpreting *what a PC means*).
+- Putting `StandardScaler` and `PCA` in a **pipeline** ensures the scaler and PCA are fit on **training data only**, then applied unchanged to test data - no leakage.
+
+#### 10. What PCA is good for (and when NOT to use it)
+**Great for：**
+- **Visualization** - squash 100-D data to 2-D/3-D to plot it.
+- **Speed & storage** - fewer columns → faster models, less memory.
+- **Removing multicollinearity** - PCs are uncorrelated by construction, which stabilizes linear/logistic regression.
+- **Denoising** - tiny-variance components are often noise; dropping them cleans the data.
+- **Compression** - e-g, image/embedding compression.
+
+**Avoid or be careful when:**
+- **You need interpretability,** PCs are blends of all features ("0.4xincome + 0.3xage - 0.2x.."), so they're hard to explain to stakeholders.
+- **Relationships are non-linear.** PCA only captures *Linear* structure. For curved/manifold data, use *t-SNE,
+UMAP, or autoencoders** instead.
+- **Features aren't scaled.** Then variance is meaningless (see step 5) -
+- **The goal is prediction and you have labels.** PCA is unsupervised - it maximizes *variance*, not *predictive power*. A low-variance direction can still be the one that predicts your target. (If you want a supervised alternative, look at **LDA - Linear Discriminant Analysis**)

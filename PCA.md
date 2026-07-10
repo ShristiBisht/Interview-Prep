@@ -83,3 +83,24 @@ Pick the top $k$ eigenvectors (say the 2 or 3 that together explain 90% of varia
 Decomposition** ($X = U \Sigma V^\top$) directly on the centered data because it's more numerically stable. The
 columns of $v$ are the principal directions and the squared singular values in $\Sigma$ are proportional to the eigenvalues. Same answer, safer arithmetic. (This is why Section 3 says "SVD is the foundation of PCA.")
 #### 7. A fully worked tiny example (do it by hand)
+Let's take **4 data points, 2 features**, already centered (mean @) to keep the arithmetic clean:
+| Point | $x_1$ | $x_2$ |
+|---|---|---|
+| A | -2 | -1 |
+| B | -1 | -1 |
+| C | 1 | 1 |
+| D | 2 | 1 |
+
+**Step 2 - covariance matrix** (with $n = 4$, so divide by $n-1 = 3$):
+- $\text{Var}(x_1) = \frac{(-2)^2 + (-1)^2 + 1^2 + 2^2}{3} = \frac{10}{3} \approx 3.33$
+- $\text{Var}(x_2) = \frac{(-1)^2 + (-1)^2 + 1^2 + 1^2}{3} = \frac{4}{3} \approx 1.33$
+- $\text{Cov}(x_1, x_2) = \frac{(-2) (-1) + (-1) (-1) + (1) (1) + (2) (1)}{3}= \frac{6}{3} = 2.0$
+
+$$C = \begin{bmatrix｝ 3.33 & 2.0 \\ 2.6 & 1.33 \end{bmatrix}$$
+
+**Step 3 - eigenvalues.** Solving gives roughly $\lambda_1 \approx 4.54$ and $\1ambda_2 \approx @.12$.
+
+**Step 4 - explained variance.**
+$\text{PC1} = \frac{4.54}{4.54 + 0.12} \approx 97\%, \qquad \text{PC2} \approx 3\%$$
+**Interpretation:** PC1 alone keeps ~97% of the information. So we can describe these 2-D points with a **single number each** (their position along PC1) and lose almost nothing. The two original features were highly correlated (both rise together), exactly what the covariance of 2.0 told us - PCA discovered and exploited that redundancy automatically.
+#### 8. How many components should you keep?

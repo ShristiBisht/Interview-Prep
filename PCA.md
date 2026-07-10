@@ -10,8 +10,7 @@ Imagine you photograph a **teapot** sitting on a table. The teapot is a 3-D obje
 - The **teapot** = your high-dimensional data.
 - Each **camera angle** = a possible new axis (a "direction" to look from).
 - The **best angle** = the direction along which the object looks "most spread out / most informative*.
-- **"Spread out" = variance.** PCA's entire job is to find the camera angles that keep the data as spread out (as
-informative) as possible, and to drop the boring angles where nothing much varies.
+- **"Spread out" = variance.** PCA's entire job is to find the camera angles that keep the data as spread out (as informative) as possible, and to drop the boring angles where nothing much varies.
 
 **Physical significance in one line:** *variance = information*. Directions where the data varies a lot carry the signal; directions where it barely varies are (often) noise or redundancy, and can be dropped.
 
@@ -22,8 +21,8 @@ Another everyday example: measuring people's **height in cm** *and* **height in 
 ---|---|
 | **Feature / dimension** | A column in your table (e-g-, height, weight, age). |
 | **Variance** | How spread out the numbers in a direction are. Big spread = lots of variety = lots of information. |
-| **Covariance** | Do two columns move *together*? Positive = rise together, negative = one rises as the other falls, ~O = unrelated. |
-| **Principal Component (PC)**| A new axis PCA invents - a *direction* through the data. PC1 = direction of most spread, PC2 = most remaining spread (at 90° to PC1), and 50 on. |
+| **Covariance** | Do two columns move *together*? Positive = rise together, negative = one rises as the other falls, ~0 = unrelated. |
+| **Principal Component (PC)**| A new axis PCA invents - a *direction* through the data. PC1 = direction of most spread, PC2 = most remaining spread (at 90° to PC1), and so on. |
 | **Loading** | How much each original feature contributes to a PC (the "recipe" of the new axis). |
 | **Score** | Your data re-expressed along the new axes (the new coordinates of each row). |
 | **Eigenvector** | The *direction* of a principal component (the pure math name). |

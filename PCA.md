@@ -102,5 +102,21 @@ $$C = \begin{bmatrix｝ 3.33 & 2.0 \\ 2.6 & 1.33 \end{bmatrix}$$
 
 **Step 4 - explained variance.**
 $\text{PC1} = \frac{4.54}{4.54 + 0.12} \approx 97\%, \qquad \text{PC2} \approx 3\%$$
+
 **Interpretation:** PC1 alone keeps ~97% of the information. So we can describe these 2-D points with a **single number each** (their position along PC1) and lose almost nothing. The two original features were highly correlated (both rise together), exactly what the covariance of 2.0 told us - PCA discovered and exploited that redundancy automatically.
+
 #### 8. How many components should you keep?
+Three standard ways to choose $k$:
+1. **Variance threshold** - keep enough PCs to reach, say, **95%** cumulative explained variance. Most common.
+2. **Scree plot / elbow** - plot eigenvalues in descending order; keep components before the curve flattens (the
+"elbow") -
+3. **Kaiser rule** - (when standardized) keep components with eigenvalue › 1, i.e. those explaining more than one original feature's worth of variance.
+```python
+  import numpy as np
+  pca_full = PCA() -fit(X_scaled)
+  # fit all components
+  cum = np. cumsum(pca_full explained_variance_ratio_)
+  k = np. argmax(cum >= 0.95) + 1
+  # smallest k reaching 95%
+  print(f"Keep {k} components to retain 95% of variance")
+```

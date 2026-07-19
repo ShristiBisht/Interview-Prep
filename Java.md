@@ -9,8 +9,8 @@
 that make concurrency correct.
 5. [`volatile`: What It Guarantees and What It Does Not](#5-volatile-what-it-guarantees-and-what-it-does-not) - Visibility/ordering via barriers, why "count++" is still broken, double-checked locking.
 6. [`synchronized`, Monitors, and Lock States](#6-synchronized-monitors-and-lock-states) - Monitor enter/exit, mutual exclusion + visibility + reentrancy, and lock-object pitfalls.
-7. [`ReentrantLock`, ReadWriteLock, StampedLock](#7-reentrantlock-readwritelock-stampedlock) - When to leave 'synchronized for timeouts, fairness, read/ write, or optimistic reads.
-8. [`final` Fields and Safe Publication](#8-final-fields-and-safe-publication) - The "Final' -field guarantee, 'this -escape bugs, and how to publish objects safely.
+7. [`ReentrantLock`, ReadWriteLock, StampedLock](#7-reentrantlock-readwritelock-stampedlock) - When to leave `synchronized` for timeouts, fairness, read/ write, or optimistic reads.
+8. [`final` Fields and Safe Publication](#8-final-fields-and-safe-publication) - The `final` -field guarantee, `this` -escape bugs, and how to publish objects safely.
 9. [Escape Analysis, Stack Allocation, and JIT Effects](#9-escape-analysis-stack-allocation-and-jit-effects) - Scalar replacement, lock elision, and why naive benchmarks measure nothing.
 10. [Garbage Collection Fundamentals](#10-garbage-collection-fundamentals) - Generational model, minor/major GC, stop-the-world, and the metrics that predict health.
 11. [G1 GC Deep Dive](#11-g1-gc-deep-dive) - Region-based "Garbage First", pause-time goals, humongous-object pitfalls, key flags.
@@ -56,18 +56,20 @@ multiplier effect.
 ## 1. Why JVM Mastery Matters at SDE3
 At SDE3, you are expected to:
 
-At SDE3, you are expected to:
 - Design systems that are correct under concurrency, not only in single-threaded tests.
 - Diagnose production incidents where failures happen only under load.
 - Reason about latency distributions (p50/p95/p99), not just average response time.
 - Make tradeoffs between throughput, latency, memory footprint, and complexity.
+
 Frameworks reduce boilerplate, but they do not remove JVM realities:
 - Threads still schedule on CPUs.
 - Memory ordering still matters.
 - GC pauses still impact tail latency.
 - Contention still destroys throughput.
 SDE3 mindset: if it is not measured, it is an assumption.
-ーーー
+
+---
+
 ## 2. JVM Architecture: Class Loader, Runtime Data Areas, Execution Engine
 
 ### 2.1 Class Loading Lifecycle
@@ -82,6 +84,7 @@ Class loaders follow parent delegation:
 - Bootstrap ClassLoader
 - Platform ClassLoader
 - Application ClassLoader
+
 Why this matters:
 - ClassLoader leaks in app servers.
 - Duplicate classes loaded by different loaders are different types.
@@ -102,10 +105,10 @@ This is why warm-up matters in benchmarks.
 
 ### 2.4 How the Pieces Fit (the "why" behind the diagram)
 **Class loading is lazy and ordered.** A class is loaded the first time it is actively used. *Linking* has three sub-steps interviewers probe:
-**verification** (bytecode is type-safe and cannot corrupt the JVM - the reason Java can run untrusted code), **preparation* (static fields get default values: `0`/`null`/`false`), and **resolution** (symbolic references → direct references). Only then does *initialization* run static blocks and assign real static values.
+**verification** (bytecode is type-safe and cannot corrupt the JVM - the reason Java can run untrusted code), **preparation** (static fields get default values: `0`/`null`/`false`), and **resolution** (symbolic references → direct references). Only then does *initialization* run static blocks and assign real static values.
 
 **Parent delegation explained:** when a loader is asked for a class, it first asks its *parent*, and only loads the class itself if the parent can't.
-This guarantees core classes (`java.lang-String` ) are always loaded by the bootstrap loader - you cannot spoof `java.lang.*`. The flip side: a class's
+This guarantees core classes (`java.lang.String` ) are always loaded by the bootstrap loader - you cannot spoof `java.lang.*`. The flip side: a class's
 **identity is `(fully-qualified-name, ClassLoader)`**. The *same* `.class` loaded by two different loaders yields two incompatible types - the source of `ClassCastException`s in app servers/plugin systems, and of **metaspace leaks** when a redeployed app's loader is never GC'd because something still references its classes.
 
 **The two-tier JIT:** code starts **interpreted**; hot methods are compiled by **C1** (fast compile, light optimization) and the hottest by **C2** (slow compile, aggressive optimization - inlining, escape analysis, loop unrolling). C2 makes *speculative* assumptions (e.g., "this call site is always
@@ -224,3 +227,59 @@ counter++;  // STILL broken under concurrency: read, +1, write are 3 steps
 ```
 
 Two threads can both read `5`, both write `6` - a lost update. For atomic counters use `AtomicInteger` / `LongAdder`; for invariants spanning multiple fields use a lock.
+
+**Canonical correct use - double-checked locking:**
+``` java
+class Holder {
+  private static volatile Config instance;  // volatile is essential
+  static Config get() {
+    Config c = instance;
+    if (c == null) {
+    synchronized (Holder-class) {
+      c = instance;
+      if (c == null) instance = c = new Config();
+    }
+    return c;
+  }
+}
+```
+
+Without `volatile`, another thread could see a non-null reference to a **half-constructed** `Config` (the reference published before the constructor's writes were visible).
+
+---
+
+## 6. synchronized, Monitors, and Lock States
+`synchronized` uses monitor enter/exit bytecodes.
+
+Properties:
+- Mutual exclusion.
+- Visibility guarantees on lock acquire/release.
+- Reentrant (same thread can acquire same lock repeatedly)
+  
+Historically lock optimizations included biased locking and lightweight locking. In modern JDKs, biased locking has been removed; still, monitor optimizations exist and evolve.
+
+### Typical Pitfall
+
+Synchronizing on mutable/public lock objects:
+
+```java
+object lock = new Object);
+// If lock reference changes, synchronization is broken.
+```
+
+Best practice: private Final lock or synchronize on `this` only when class boundaries are controlled.
+
+### What synchronized Actually Provides
+Every Java object has an associated **monitor**, `synchronized` compiles to `monitorenter` /`monitorexit` bytecodes around the block, giving three guarantees:
+- **Mutual exclusion** - only one thread holds the monitor at a time.
+- **Visibility** - acquiring the lock sees all writes made before the *previous* release of the same monitor (the monitor-lock happens-before edge).
+- **Reentrancy** - the same thread can re-acquire a monitor it already holds, preventing self-deadlock in recursive/nested calls.
+
+**Why the pitfall matters:** if the lock reference can change, two threads may lock *different* objects and both enter the critical section - broken mutual exclusion. Always:
+```java
+private final Object lock = new Object(); // final reference, never reassigned
+void update() { synchronized (lock) { /* critical section */ }}
+```
+Avoid `synchronized(this)` on classes whose instances are exposed (callers could lock on your object and cause deadlock) and never lock on a `String` literal or boxed primitive (they are shared/interned).
+
+---

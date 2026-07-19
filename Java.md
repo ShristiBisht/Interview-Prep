@@ -263,8 +263,7 @@ Historically lock optimizations included biased locking and lightweight locking.
 Synchronizing on mutable/public lock objects:
 
 ```java
-object lock = new Object);
-// If lock reference changes, synchronization is broken.
+object lock = new Object();  // If lock reference changes, synchronization is broken.
 ```
 
 Best practice: private Final lock or synchronize on `this` only when class boundaries are controlled.

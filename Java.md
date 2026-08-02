@@ -81,7 +81,7 @@ SDE3 mindset: if it is not measured, it is an assumption.
 
 - **p50 (median)** - 50% of requests were **at or below** this latency. Half your traffic is faster, half is slower. This is the "typical" experience.
 - **p95** - 95% of requests were at or below this latency. Only 1 in 20 requests was slower. This starts capturing the *bad* experiences.
-- **p99** - 99% of requests were at or below this latency. Only 1 in 100 was slower. This is the "tail" - where GO pauses, lock contention, and slow downstream calls show up.
+- **p99** - 99% of requests were at or below this latency. Only 1 in 100 was slower. This is the "tail" - where GC pauses, lock contention, and slow downstream calls show up.
 - **p999 (three-nines)** - 999 in 1000 requests were at or below. Captures rare but user-impacting spikes.
 - **p9999** - used at very high scale (hyperscale services) where even 1 in 10,000 matters.
 

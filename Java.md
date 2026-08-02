@@ -89,7 +89,7 @@ SDE3 mindset: if it is not measured, it is an assumption.
 
 Suppose 100 requests: 99 take 10 ms, one takes 2000 ms.
 - **Average** = (99 x 10 + 2000) / 100 = **29.9 ms** - looks healthy.
-- w*p50*w = 10 ms
+- **p50** = 10 ms
 - **p99**= ~2000 ms - one user waited **2 seconds**.
 
 The average *hides* the outlier. At scale, that outlier is not one user - it is thousands per hour. **Averages are dangerous because a few very slow requests barely move them, but ruin user experience.**
@@ -174,7 +174,7 @@ Key facts:
 **Preparation** - static fields are allocated and given their **default JVM values** (not their source-code initializers yet):
 
   
-| Field type | Default at preparation I
+| Field type | Default at preparation |
 |---|---| 
 |`int`, `short`, `byte`, `char` | `0`|
 | `long` | `0L` |

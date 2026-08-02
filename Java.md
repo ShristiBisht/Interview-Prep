@@ -52,6 +52,13 @@ multiplier effect.
 46. [Core Java Interview Deep Dives (Where Interviews Go Deep)](#46-core-java-interview-deep-dives-where-interviews-go-deep) - Mechanism + tradeoff + gotcha for the topics interviewers drill.
 47. [Java Streams Deep Dive (Producers, Consumers, and Real Examples)](#47-java-streams-deep-dive-producers-consumers-and-real-examples) - Pipeline model, sources/collectors, parallelism, and worked examples.
 48. [JVM Internals Deep Dive (From Source to Machine Code)](#48-jvm-internals-deep-dive-from-source-to-machine-code) — The full path from `-.java` down to executing machine code.
+49. [Hardware Foundations: CPU, Cache Coherence, and Memory Orderingl(#49-hardware-foundations-cpu-cache-coherence-and-memory-ordering) - The x86/ARM reality that makes `volatile` and barriers necessary.
+50. [Memory Barriers, VarHandle, and the JMM Under the Hood](#50-memory-barriers-varhandle-and-the-jmm-under-the-hood) - How `volatile` / `synchronized` / `Final` map to hardware fences on x86 vs ARM.
+51. [Locks, Monitors, and AQS at the Bit Level](#51-locks-monitors-and-aqs-at-the-bit-level) - Mark-word encoding, lock inflation, `ObjectMonitor`, and `AbstractQueuedSynchronizer`.
+52. [Allocation, GC Barriers, and Colored Pointers Under the Hood](#52-allocation-gc-barriers-and-colored-pointers-under-the-hood) - TLAB bump allocation, card tables, SATB, and ZGC/Shenandoah barriers.
+53. [Reading Real JIT Output (Interpreter + Assembly Walkthrough)](#53-reading-real-jit-output-interpreter--assembly-walkthrough) - Template interpreter
+dispatch, inline caches, `-XX:+PrintAssembly` walkthrough.
+
 
 ## 1. Why JVM Mastery Matters at SDE3
 At SDE3, you are expected to:

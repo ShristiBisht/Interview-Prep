@@ -320,12 +320,10 @@ lock unlock();
 Use only when benchmarks prove benefit.
 
 ### How to Choose
-"synchronized" is simpler and the JVM optimizes it well - start there. Reach for "java.util.concurrent.locks" only when you need a capability it cannot provide:
-**ReentrantLock** - when you need "tryLock() (don't block forever), a timeout, interruptible acquisition, or fairness. The cost: you **must** "unlock () in a "finally', or you leak the lock permanently.
+`synchronized` is simpler and the JVM optimizes it well - start there. Reach for `java.util.concurrent.locks` only when you need a capability it cannot provide:
+**ReentrantLock** - when you need `tryLock()` (don't block forever), a timeout, interruptible acquisition, or fairness. The cost: you **must**  `unlock()` in a `finally`, or you leak the lock permanently.
 - **ReadWriteLock** - when reads vastly outnumber writes *and* the critical section is non-trivial. Many readers run concurrently; writers are exclusive. If the critical section is tiny, the extra bookkeeping is not worth it.
-- **StampedLock** - adds an *optimistic read**: read without locking, then *validate* the stamp; if a
-hen *validate* the stamp: if a writer intervened, retry or fall back to a rea
-read lock. Extremely fast under low write contention, but **not reentrant** and easy to misuse.
+- **StampedLock** - adds an **optimistic read**: read without locking, then *validate* the stamp : if a writer intervened, retry or fall back to a real read lock. Extremely fast under low write contention, but **not reentrant** and easy to misuse.
 
 **StampedLock optimistic-read pattern:**
 

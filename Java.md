@@ -207,7 +207,7 @@ if (ready) { // (3) volatile read - sees (2)
 
 ---
 
-## 5, volatile: What It Guarantees and What It Does Not
+## 5. volatile: What It Guarantees and What It Does Not
 
 `volatile` guarantees:
 - Visibility of writes to all threads.
@@ -289,3 +289,32 @@ void update() { synchronized (lock) { /* critical section */ }}
 Avoid `synchronized(this)` on classes whose instances are exposed (callers could lock on your object and cause deadlock) and never lock on a `String` literal or boxed primitive (they are shared/interned).
 
 ---
+
+## 7. ReentrantLock, ReadWriteLock, StampedLock
+### ReentrantLock
+Pros over `synchronized` :
+- `tryLock()` and timeout variants.
+- Interruptible lock acquisition.
+- Optional fairness.
+Cons:
+- Easier to forget `unlock()`.
+```java
+lock.lockO;
+try f
+// critical section
+} Finally {
+lock unlock();
+```
+
+### ReadwriteLock
+
+- Multiple readers, single writer.
+- Helps if reads dominate and critical sections are non-trivial.
+
+### StampedLock
+
+- Optimistic read mode can reduce contention.
+- Not reentrant.
+- Careful validation required.
+
+Use only when benchmarks prove benefit.

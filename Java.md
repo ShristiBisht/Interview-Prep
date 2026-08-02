@@ -75,29 +75,194 @@ Frameworks reduce boilerplate, but they do not remove JVM realities:
 - Contention still destroys throughput.
 SDE3 mindset: if it is not measured, it is an assumption.
 
+### 1.1 Latency Percentiles (p50 / p95 / p99 / p999) - What They Are and Why They Matter
+
+**p50, p95, p99** are **percentiles** of a latency distribution. If you sort every request's response time from fastest to slowest:
+
+- **p50 (median)** - 50% of requests were **at or below** this latency. Half your traffic is faster, half is slower. This is the "typical" experience.
+- **p95** - 95% of requests were at or below this latency. Only 1 in 20 requests was slower. This starts capturing the *bad* experiences.
+- **p99** - 99% of requests were at or below this latency. Only 1 in 100 was slower. This is the "tail" - where GO pauses, lock contention, and slow downstream calls show up.
+- **p999 (three-nines)** - 999 in 1000 requests were at or below. Captures rare but user-impacting spikes.
+- **p9999** - used at very high scale (hyperscale services) where even 1 in 10,000 matters.
+
+#### Why the Average (Mean) Lies
+
+Suppose 100 requests: 99 take 10 ms, one takes 2000 ms.
+- **Average** = (99 x 10 + 2000) / 100 = **29.9 ms** - looks healthy.
+- w*p50*w = 10 ms
+- **p99**= ~2000 ms - one user waited **2 seconds**.
+
+The average *hides* the outlier. At scale, that outlier is not one user - it is thousands per hour. **Averages are dangerous because a few very slow requests barely move them, but ruin user experience.**
+
+#### Why Tail Latency Matters at Scale (Fan-Out Amplification)
+
+Modern services fan out: one user request calls 10, 50, or 100 backend services in parallel and waits for all of them.
+
+If each backend has p99 = 100 ms (i.e., 1% chance a call is slow):
+- **1 backend call** -> 99% chance the user request is fast.
+- **10 parallel backend calls** -> probability *all* are Fast = 0.99^10 = **90%**. So **10% of user requests hit the tail**.
+- **100 parallel calls** -> 0.99^100 = **37%**. So **63% of user requests hit the tail**.
+
+This is the classic result from Jeff Dean's *"The Toil at Scale"*: **your p99 becomes your users' median at fan-out scale**. Optimizing average latency is meaningless when architecture amplifies the tail.
+
+#### What Each Percentile Tells You Diagnostically
+| Percentile | What It Reveals |
+|---|---|
+|**p50**| Baseline health. Steady-state performance of the happy path. |
+|**p95**| Normal-but-slow requests. Cache misses, mild contention, warm-up effects. |
+|**p99**| Real tail issues. GC pauses, lock contention, connection pool waits, retries. |
+|**999**| Rare pathologies. STW GC, safepoint bias, host-level noise (noisy neighbor), thread pool starvation. | 
+|**max** | Almost useless as an SLO - dominated by single-event outliers. Track it, don't gate on it. |
+
+#### How SLOs Are Written
+
+Real SLOs are always percentile-based, never average-based:
+- *"p99 request Latency ‹ 200 ms over a 5-minute window, 99.9% of the time."*
+- *"Average Latency ‹ 100 ms."* (Meaningless - hides tail.)
+
+Error budgets (Section 38) are computed against these percentile SLOS.
+
+#### Where the Tail Comes From in a JVM Service
+
+The tail (p99+) is almost always one of:
+1. **GC pauses** - a stop-the-world event freezes the JVM for tens to hundreds of milliseconds. Every in-flight request pays that cost. This is *the* #1 tail-latency driver in Java, and why ZGC/Shenandoah (Section 12) exist.
+2. **Lock contention** - a thread waits on a "synchronized" block held by someone else. Under load, wait queues grow non-linearly.
+3. **Executor / thread-pool saturation** - the request sits in the work queue before a worker even picks it up (queueing delay, not service time).
+4. **Downstream slow calls** - a database, cache, or HTTP dependency hit *its* tail; you inherited it.
+5. **Connection pool exhaustion** - the request waits for a JDBC/HTTP connection to free up.
+6. **JIT deoptimization / compilation** - a rare recompile stalls execution.
+7. **Safepoint delays** - the JVM waits for all threads to reach a safepoint before GC (long-running loops without safepoint polls extend this).
+8. **OS-level noise** - CPU throttling, page faults, noisy neighbors in containers, network jitter.
+
+#### How You Actually Measure Percentiles
+
+You **cannot** compute percentiles by averaging averages. You need the full distribution (or an approximation of it):
+- **Histograms** - bucket every request into latency bins (e.g., `HdrHistogram`, Micrometer's `Timer` with `publishPercentileHistogram`. Percentiles are read off the histogram.
+- **Sketches** - approximate distributions with bounded error (e.g, `t-digest`, DDSketch). Used by Datadog, Prometheus (with caveats) -
+- **Sampling** - capture a random subset of raw latencies. Cheap, but poor tail resolution.
+  
+**Never** compute percentiles from pre-averaged data (e-g, averaging per-minute averages). The math does not compose - you will silently under-report the tail. Percentiles must be aggregated from raw buckets/sketches.
+
+#### The Coordinated Omission Trap
+A subtle but important benchmarking bug: if your load generator waits for each response before sending the next request, then when the server stalls (e.g., a GC pause), the generator *stops sending*. The requests that *would have* arrived during the stall are never measured - so the stall's impact on latency is silently omitted. Tools like `wrk2` and `HdrHistogram` correct for this by measuring latency against the *intended* send time, not the actual send time. Ignoring coordinated omission makes p99 look 10-100x better than reality.
+#### Quick Mental Model
+- **p50** answers: *"How fast is my service normaLLy?"*
+- **p99** answers: *"How bad does it get for real users?*
+- **p999** answers: *"What's my worst-case that still happens often enough to care?"*
+At SDE3, if someone asks *"is the service healthy?"* and you answer with an average, you have already failed the seniority signal.
+
 ---
 
 ## 2. JVM Architecture: Class Loader, Runtime Data Areas, Execution Engine
 
 ### 2.1 Class Loading Lifecycle
-Every class goes through:
-1. Loading: bytecode bytes become a "Class" object.
-2. Linking:
-- Verification
-- Preparation
-- Resolution
-3. Initialization: static initializers execute.
-Class loaders follow parent delegation:
-- Bootstrap ClassLoader
-- Platform ClassLoader
-- Application ClassLoader
+Every class goes through three JVM-mandated phases before its code can execute. Phases are **lazy** - a class is only loaded when it is first *actively used* (`new`, static access, `Class.forName`, subclass initialization, etc.). Merely mentioning a type name (e.g-, as a field type) does not trigger loading.
 
-Why this matters:
-- ClassLoader leaks in app servers.
-- Duplicate classes loaded by different loaders are different types.
-- Plugin architectures rely on custom class loaders.
+#### Phase 1 - Loading
+The JVM reads the raw `.class` bytes (from disk, JAR, network, or generated in-memory) and creates an in-memory `java.lang-Class<?>` object representing the type. The `ClassLoader` is what actually locates and reads those bytes; the JVM itself does not know where the bytes came from.
+Key facts:
+- The result is a single `Class` object per (fully-qualified name, defining ClassLoader) pair.
+- The `Class` object lives in the **heap**, but the class *metadata* (method tables, constant pool, bytecode) lives in **Metaspace** (native memory, since Java 8; before that, PermGen).
+- Loading can trigger recursive loading of the superclass and superinterfaces (they must be loaded before this class can be linked).
+
+#### Phase 2 - Linking (Verification + Preparation + Resolution)
+**Verification** - the JVM proves the bytecode is *safe*:
+- Stack map frames are consistent (types match at every branch target) -
+- No jumps outside method bounds, no illegal type conversions, no access to private members from outside.
+- The verifier is **the reason Java can safely run untrusted code** (applets, plugin JARs). If verification fails, you get `VerifyError`.
+
+**Preparation** - static fields are allocated and given their **default JVM values** (not their source-code initializers yet):
+
+  
+| Field type | Default at preparation I
+|---|---| 
+|`int`, `short`, `byte`, `char` | `0`|
+| `long` | `0L` |
+| `Float` | `0.0F` |
+| `double` | `0.0d` |
+| `boolean` | `False` |
+| reference | `null` |
+
+Note: `static final` **primitive/String** constants known at compile time are folded into the constant pool and appear "set" from the very start - this is why they can be safely read even before initialization.
+
+**Resolution** - symbolic references in the constant pool (e.g., `"java/util/List"`, `"add: (Ljava/lang/Object;)Z"`) are replaced with **direct references** (pointers to actual `Class`, method, or field structures). Resolution can be lazy - the JVM may defer it until the reference is first used.
+
+#### Phase 3 - Initialization
+
+The **only** phase your code controls. The JVM runs the class's `‹clinit>` method - a synthetic method that contains:
+- Static field initializers, in source order.
+- All `static {... }` blocks, in source order.
+
+Rules interviewers probe:
+- `‹clinit>` runs **exactly once** per `Class` object, and the JVM guarantees this with a lock on the `Class` - no explicit synchronization needed.
+(This is why the *initialization-on-demand holder idiom* is a correct singleton.)
+- Initialization of a class triggers initialization of its **superclass** first (but not its superinterfaces, unless a `default` method is inherited).
+- If `‹clinit>` throws, the class is marked *erroneous* - every subsequent access throws `NoClassDefFoundError`, forever, for that loader. Common in production: a static block reads a config file that is missing, and every request thereafter fails with a confusing `NoClassDefFoundError` instead of the original `IOExcention`
+
+#### The Full Sequence, Visualized
+```
+Loading   -->   Verification   -->   Preparation   -->   Resolution (may be lazy)   -->   Initialization (runs < clinit>)
+bytes            safe?                static fields        symbolic refs                    your code runs (once)
+  -> Class         -> VerifyError        = defaults            -> direct refs
+```
+
+#### Class Loaders and Parent Delegation
+Since Java 9, the standard hierarchy is:
+| Loader | Loads what | Written in |
+|---|---|---|
+| **Bootstrap** | Core JDK modules (`java.base`, `java.logging`, ...) | Native code (C++) - has no Java `ClassLoader` object; `String.class.getClassLoader()` returns `null` |
+| **Platform** (was "Extension" before Java 9) | Additional JDK modules (`java-sql`, `java-xml`, ...) | Java |
+| **Application** (a.k.a. System) | Your app classes from `-cp` / module path | Java |
+| **Custom** (Framework/plugin/web-app) | Anything else - plugin JARs, hot-reloaded code, O5Gi bundles, Tomcat webapps | Java |
+
+**Parent delegation** - when asked to load a class, a loader **first delegates to its parent**, and only loads the class itself if the parent returns `null`. Effect:
+- Core classes (`java.lang-String`) are *always* loaded by the bootstrap loader. You cannot ship your own `java.lang.String` on the classpath and have it override the real one - the bootstrap loader will win first. This is a **security guarantee**, not a convention.
+- The application loader can see everything platform + bootstrap loaded, but not the other way around (parents cannot see children).
+
+```
+        Bootstrap
+          ^ delegates first
+        Platform
+          ^ delegates first
+        Application
+          ^ delegates first
+        Custom (Tomcat webapp / Spring Boot fat-jar / plugin)
+```
+
+Some frameworks *invert* delegation deliberately (e.g., Tomcat's `WebappClassLoader` tries itself first for app classes) so a webapp's bundled library version wins over the container's version. This is legal but powerful - and the source of many "works locally, fails in prod" mysteries.
+
+#### Class Identity - the Rule Interviewers Test
+
+› **A class's runtime identity is the pair `(fully-qualified name, defining ClassLoader)`, not just the name.**
+
+Consequences that trip up senior engineers:
+- `com.acme.Foo` loaded by loader A and `com.acme.Foo` loaded by loader B are **different types**. Casting one to the other throws `ClassCastException` even though the source is identical.
+- `static` fields are per-`Class`, not per-name - so a class loaded twice has *two* independent copies of its statics. Singletons "leak" across plugin reloads for exactly this reason.
+- `instanceof` compares against a specific `Class` object; a plugin can pass "the same" type to the host and fail an `instanceof` check.
+
+#### Why This Matters in Production
+1. **ClassLoader / Metaspace leaks in app servers.** When you redeploy a webapp, the container discards the old `WebappClassLoader` so its classes can be GC'd From Metaspace. But if *anything* still holds a reference into that loader - a `ThreadLocal` on a pooled thread, a JDBC driver registered in `DriverManager`, an MBean, a static cache in a parent-loaded library, a thread the app started and never stopped - the entire loader (and every class it defined) is retained. After a few redeploys, Metaspace Fills and you get "OutOfMemoryError: Metaspace. This is the #1 real-world cause of "we restart Tomcat every night."
+2. **Plugin architectures.** OSGi, JPMS layers, Spring Boot's `LaunchedURLClassLoader`, Intelli] plugins - all rely on custom loaders to give each plugin its own namespace so plugins can bundle conflicting library versions without clashing.
+3. **Duplicate-class bugs.** Same JAR appearing on both the container and the app classpath → two `Class` objects → confusing `ClassCastException` or "method not found" errors on reflection.
+4. **Hot reload / dev-time tooling.** Spring DevTools, JRebel, and IDE hot-swap all work by discarding a classloader and loading a fresh one - which is why static state and cached `Class` references break under hot reload.
+5. **Erroneous classes are permanent.** A failed `<clinit›` marks the class unusable *for that Loader's Lifetime*. Restart or a fresh loader is the only recovery.
+
+#### Diagnostic Commands
+```bash
+# See every class loaded and by which loader
+java -Xlog:class+load=info,class+init=info YourApp
+
+# Live inspection
+jcmd ‹pid› vM. classloader_stats # loader-by-loader class counts / bytes
+jcmd ‹pid› GC.class_histogram | head # what's dominating memory
+jcmd <pid> VM.metaspace # netspace conting me used / capacity
+imap -clstats ‹ pid› # classloader statistics
+```
+
+If Metaspace grows unbounded across redeploys, a heap dump analyzed in Eclipse MAT with the **"Duplicate Classes"** and **"Classloader Leaks"** reports will point straight at the retaining reference.
 
 ### 2.2 Runtime Data Areas
+
 - Heap: objects and arrays.
 - Metaspace: class metadata.
 - Java Stacks: stack frames per thread.
@@ -105,6 +270,7 @@ Why this matters:
 - Native Method Stack: JNI/native calls.
 
 ### 2.3 Execution Engine
+
 - Interpreter executes bytecode directly.
 - JIT compiler (C1/C2) compiles hot code paths to machine code.
 - Deoptimization can revert compiled code if assumptions break.

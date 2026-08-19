@@ -457,54 +457,175 @@ Avoid `synchronized(this)` on classes whose instances are exposed (callers could
 ---
 
 ## 7. ReentrantLock, ReadWriteLock, StampedLock
-### ReentrantLock
-Pros over `synchronized` :
-- `tryLock()` and timeout variants.
-- Interruptible lock acquisition.
-- Optional fairness.
-Cons:
-- Easier to forget `unlock()`.
-```java
-lock.lockO;
-try f
-// critical section
-} Finally {
-lock unlock();
-```
 
-### ReadwriteLock
 
-- Multiple readers, single writer.
-- Helps if reads dominate and critical sections are non-trivial.
 
-### StampedLock
+private Final Reentrantlock lock = new ReentrantLock(=
 
-- Optimistic read mode can reduce contention.
-- Not reentrant.
-- Careful validation required.
 
-Use only when benchmarks prove benefit.
+private final Condition notEmpty = lock. newCondition();
 
-### How to Choose
-`synchronized` is simpler and the JVM optimizes it well - start there. Reach for `java.util.concurrent.locks` only when you need a capability it cannot provide:
-**ReentrantLock** - when you need `tryLock()` (don't block forever), a timeout, interruptible acquisition, or fairness. The cost: you **must**  `unlock()` in a `finally`, or you leak the lock permanently.
-- **ReadWriteLock** - when reads vastly outnumber writes *and* the critical section is non-trivial. Many readers run concurrently; writers are exclusive. If the critical section is tiny, the extra bookkeeping is not worth it.
-- **StampedLock** - adds an **optimistic read**: read without locking, then *validate* the stamp : if a writer intervened, retry or fall back to a real read lock. Extremely fast under low write contention, but **not reentrant** and easy to misuse.
 
-**StampedLock optimistic-read pattern:**
+private final Condition notFull = lock newCondition();
+
+
+private final Object[] slots;
+
+
+
+### 7.1 The Decision Table
+
+| Need | Use | Why |
+|---|---|---|
+| Simple mutual exclusion, small critical section | "synchronized | JVM optimises it; impossible to leak a lock |
+| Need "tryLock', timeout, or interruptibility | "ReentrantLock | synchronized cannot do any of these | 
+| Need fairness (FIFO acquisition) | "ReentrantLock(true)* | synchronized is barging-friendly - no FIFO guarantee | 
+| Multiple wait conditions (producer / consumer) | "ReentrantLock° + "Condition' | Cleaner than a single monitor with "notifyAll | 
+| Reads vastly outnumber writes; long critical sections | "ReentrantReadWriteLock' | Concurrent readers | 
+| Rare writes; readers should skip locking entirely | 'StampedLock' (optimistic) | Cheapest read path in the JDK | 
+| Simple shared state without any blocking | 'Atomic* / AtomicReference<Snapshot> | No lock at all (Section 3.6) |
+
+### 7.2 ReentrantLock - the workhorse
 
 ```java
-private final StampedLock s1 = new StampedLock);
-double distanceFromOrigin() {
-  long stamp = s1.try0ptimisticRead(); // no lock acquired
-  double cx = x, cy = y;  // read fields
-if (!s1.validate(stamp)) {  // a writer intervened?
-  stamp = sl. readLock();  // fall back to real read lock
-  try { cx = x; cy = y; } finally { sl.unlockRead(stamp); }
+private final ReentrantLock lock = new ReentrantLock();
+private final Condition notEmpty = lock.newCondition();
+private final Condition notFull = lock newCondition();
+private final object[] slots;
+private int head, tail, count;
+
+void put (Object x) throws InterruptedException {
+  lock.lock(); // ALWAYS pair with try/finally
+  try {
+    while (count = slots.length) notFull-await();
+    slots[tail] = x;
+    tail = (tail + 1) % slots. length;
+    count++; notEmpty-signal(); // wake exactly one taker - safe now
+  } finally {
+    lock unlock();
+  }
 }
-return Math.hypot (cx, cy);
+Object take() throws InterruptedException {
+  lock.lockO;
+  try {
+    while (count = 0) notEmpty-await();
+    Object x = slots[head]; slots[head] = null;
+    head = (head + 1) % slots.length;
+    count--;
+    notFull-signal();  // wake exactly one putter
+    return x;
+  } finally {
+  lock unlock();
+ }
 }
 ```
+
+**Two `Condition`s let you use `signal` instead of `signalAll`** - you wake exactly the right kind of waiter. `ArrayBlockingQueue` is literally this code.
+
+**What Reentrantlock gives you that `synchronized` cannot:**
+- `tryLock()` - non-blocking attempt. Returns `false` immediately if the lock is held.
+- `tryLock(timeout, unit)` - bounded wait. Returns `false` on timeout, allowing recovery instead of unbounded blocking.
+- `lockInterruptibly()` - the waiter can be `Thread interrupt()`ed while blocked. `synchronized` waiters are **not** interruptible - you cannot cancel them.
+- `newCondition()` - multiple wait queues, one per logical condition.
+- Fairness constructor - `new ReentrantLock(true)` acquires in FIFO order.
+  
+**The one drawback:** forgetting `unlock()` in a `finally` leaks the lock forever, and the JVM will not help you. IDEs and static analysers catch most cases - use them.
+
+**trylock deadlock-avoidance pattern:**
+
+```java
+boolean transfer(Account from, Account to, long amt) throws InterruptedException {
+  while (true) {
+  if (from.lock.tryLock()) {
+    try {
+      if (to.lock.tryLock()) {
+      try {
+      From-debit(amt); to.credit(amt);
+      return true;
+      } finally { to.lock.unlock(); }
+    } Finally { from.lock.unlock(); }
+  }
+  // Back off with jitter to avoid livelock
+  Thread.sleep(ThreadLocalRandom.current()-nextInt(1, 5));
+  }
+}
+```
+No global lock ordering needed; deadlock is impossible - either thread that fails its second `tryLock` releases the first and retries.
+
+### 7.3 ReentrantReadWriteLock - when reads dominate
+```java
+  private Final ReentrantReadWriteLock rw = new ReentrantReadWriteLock();
+  private final Lock r = rw.readLock();
+  private final Lock w = rw.writeLock();
+  private final Map<String, String> cache = new HashMap():
+  String get(String k) {
+    r-lock();
+    try { return cache.get(k); }
+    finally { r.unlock(); }
+  }
+  void put(String k, String v) {
+    w.lock():
+    try { cache-put(k, v); }
+    finally { w.unlock(); }
+  }
+```
+
+Many readers may hold the read lock simultaneously; a writer holds the write lock exclusively. **Caveats:**
+
+- **Writer starvation** in unfair mode under heavy read load - writers may wait forever. Use "new ReentrantReadwriteLock(true)* for fairness, at throughput cost.
+- **Downgrading** (hold write + acquire read + release write) is legal and useful. **Upgrading* (hold read » acquire write) is **not** - two readers both trying to upgrade will deadlock.
+- **Only worth it if the critical section is non-trivial.** For a simple "map-get, use 'ConcurrentHashMap* - the read-lock bookkeeping exceeds the work being protected.
+- **Never do I/0 under the read lock.** All readers stall behind one slow reader.
+
+### 7.4 StampedLock - optimistic reads for read-mostly state
+Three modes: write, pessimistic read, and *optimistic read** (no actual lock).
+
+```java
+class Point {
+  private final StampedLock sl = new StampedLock@:
+  private double x, y;
+
+  double distanceFromOrigin() {
+    long stamp = s1. tryOptimisticReadO; //no lock - just a version stamp
+    double cx = x, cy = У; // read Fields (may be inconsistent!)
+    if (!s1.validate(stamp)) { // did a writer intervene?
+      stamp = sl.readLock(); // fall back to real read lock
+      try { cx = x; cy = y; }
+      Finally { s1.unlockRead (stamp); }
+    }
+    return Math. hypot (cx, cy);
+  }
+
+  void move(double dx, double dy) {
+    long stamp = s1.writeLock();
+    try { x += dx; y += dy; }
+    Finally { s1. unlockWrite(stamp); }
+  }
+}
+```
+
+Optimistic read is essentially free when writes are rare - no CAS, no fence beyond a plain volatile-like read of the stamp. Costs:
+
+- **Not reentrant.** Recursive acquisition deadlocks.
+- **Not condition-aware.** No "newCondition)".
+- **Optimistic reads may see torn / inconsistent intermediate state.** Always сору fields to locals *before* calling validate', and never deneference an object read optimistically without first validating (else you may "NullPointerException on a stale reference).
+- **Never call "Thread interrupt'** on a thread blocked in "StampedLock" - old versions had CPU spin bugs; modern versions are safer but the pattern is still niche.
+
+Use it only when profiling proves  `ReentrantReadWriteLock` is your bottleneck.
+
+### 7.5 Fairness - the trade you're actually making
+
+- **Non-fair (default):** an arriving thread may barge ahead of already-queued waiters if the lock is momentarily free. Higher throughput; some threads can be starved for long periods.
+- **Fair:** strict FIFO - every arriving acquirer joins the tail of the queue. Latency variance drops; throughput drops ~2-5x.
+
+Fairness matters when a starved thread would violate an SLO (e.g., a high-priority write behind a torrent of reads). Otherwise leave it off - the throughput win of unfair mode is real.
+
+### 7.6 Common Mistakes
+
+1. **Forgetting `finally`.** Every `.lock()` must be paired with `.unlock()` in a `finally`- IDE live-templates exist - use them.
+2. **Exposing the lock via a getter.** `getLock()` breaks encapsulation and lets external code deadlock you.
+3. **Using `ReadWriteLock` for tiny critical sections.** The read-lock bookkeeping dominates the actual work. Prefer `ConcurrentHashMap`, `AtomicReference`, or `synchronized`.
+4. **Holding any lock across an I/O call.** If the I/O stalls (network, disk, downstream service), every waiter stalls. Copy the data out, release the lock, then perform the I/0.
+5. **Mixing lock types on the same state.** If some paths use `synchronized(this)` and others use a `Reentrantlock`, they do not exclude each other - they are completely independent monitors. Pick one and enforce it.
 
 ---
-

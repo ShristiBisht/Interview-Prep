@@ -1,4 +1,4 @@
-<img width="1156" height="666" alt="image" src="https://github.com/user-attachments/assets/547f3ad4-3498-411e-ad03-2ac606bb8098" /># Cracking CAT for IIM A / B / C - The 99+ Percentile Playbook
+# Cracking CAT for IIM A / B / C - The 99+ Percentile Playbook
 
 > A field manual for QA, VARC (VA), and DILR (LR). Written for the aspirant who does not want to *pass* CAT - they want to *convert* IIM Ahmedabad, Bangalore, or Calcutta.
 
@@ -21,8 +21,6 @@ CAT is scored on **percentile**, not marks. A raw score of ~75 typically convert
 - they use a **composite score** with sectional cutoffs.
 
 ### 1.1 Shortlist thresholds (indicative - general category, engineer male)
-***** (Calcutta) | 99+ | 85 | 80 | 85 | CAT score + 10th/12th |
-> **Trap:** Non-engineer males and women get 3-5 %ile relaxation. Engineer males have the toughest bar - you cannot afford a weak section.
 
 | IIM | Overall %ile | VARC %ile | DILR %ile | OA %ile | Extra weight |
 |---|---|---|---|---|---|
@@ -33,21 +31,25 @@ CAT is scored on **percentile**, not marks. A raw score of ~75 typically convert
 > **Trap:** Non-engineer males and women get 3-5 %ile relaxation. Engineer males have the toughest bar - you cannot afford a weak section.
 
 ### 1.2 The three-legged stool
-$$\text{Final Call} = f(\text{CAT}, \text(Academic Profile}, \text{Work-ex}) + \text{WAT/GD/PI}$$
 
-- **IIM A:** 10th (-20%) + 12th (~10%) + Grad (•10%) is baked in. A 60% in 10th can end your A dream before you write CAT. Fix it with a monster CAT + WAT/PI.
+$$\text{Final Call} = f(\text{CAT}, \text{Academic Profile}, \text{Work-ex}) + \text{WAT/GD/PI}$$
+
+- **IIM A:** 10th (-20%) + 12th (~10%) + Grad (~10%) is baked in. A 60% in 10th can end your A dream before you write CAT. Fix it with a monster CAT + WAT/PI.
 - **IIM B:** Weightages more balanced, work-ex diversity (non-IT, non-engineering) rewarded
 - **IIM C:** Purest CAT weightage among the three - best hope for a strong CAT but weak profile.
 
 ### 1.3 The engineer-male target
-- **CAT overall:** 99.5+ (target raw ~78-82) -
+- **CAT overall:** 99.5+ (target raw ~78-82).
 - **Sectional:** 95+ each (no soft section).
 - **Acads:** 10th ≥ 98%, 12th ≥ 90%, Grad ≥ 8.0 CGPA gives full points. Below 80% in any = points bleed.
+
+---
 
 ## 2. Meta-Strategy - How Toppers Actually Think
 
 ### 2.1 Percentile math
-Percentile is relative. Every skipped question in your strong section is a 99%iler's gain. **Attempts matter, but accuracy matters more.** A 22/22 attempt beats a 26/22 attempt (four wrongs = -4, net 18) -
+
+Percentile is relative. Every skipped question in your strong section is a 99%iler's gain. **Attempts matter, but accuracy matters more.** A 22/22 attempt beats a 26/22 attempt (four wrongs = -4, net 18).
 
 | Attempted | Correct | Wrong | Score | Typical %ile (QA) |
 |---|---|---|---|---|
@@ -81,17 +83,17 @@ Weeks 1-4: concepts feel like the bottleneck. Weeks 5-12: mocks feel brutal. Wee
 |**Algebra** (equations, inequalities, functions, logs, quadratics) | 4-6 | High |
 |**Number Systems** (divisibility, remainders, HCF/LCM, base systems) | 2-3 | High |
 |**Geometry & Mensuration** | 3-4 | Medium |
-| **Modern Math** (P&C, probability, sequences & series, set theory) | 2-3 | Medium |
+|**Modern Math** (P&C, probability, sequences & series, set theory) | 2-3 | Medium |
 
 › **Insight:** Arithmetic alone can carry you to 90%ile in QA. Master it *cold* before spending a week on P&C.
 
 ### 3.2 The formula sheet you actually need
 
 **Percentages / Profit-L055**
-$$\text{Successive change: 1 a\% \textf then 1 b\% \Rightarrow a + b + \frac{ab}{100}$$
+$$\text{Successive change: } a\% \textf{ then } b\% \Rightarrow a + b + \frac{ab}{100}$$
 
 **Time-Speed-Distance**
-$$\text{Avg speed (equal distance)} = \frac{2 v_1 v_2}(v_1 + v_2}$$
+$$\text{Avg speed (equal distance)} = \frac{2 v_1 v_2}{v_1 + v_2}$$
 
 **Time-Work**
 $$\text{If A does in } a, \text{B in } b: \text{ together } = \frac{ab}{a+b}$$
@@ -100,17 +102,17 @@ $$\text{If A does in } a, \text{B in } b: \text{ together } = \frac{ab}{a+b}$$
 $$A = P\left(1 + \frac{r}{100}\right)^n \quad ; \quad CI - SI \text{ (2 yrs)} = P\left(\frac{r}{100}\right)*2$$
 
 **Number Systems**
-- Number of factors of $N = p_1^{a_1} p_2^(a_2} \ldots$ is $(a_1+1)(a_2+1)\ldots$
+- Number of factors of $N = p_1^{a_1} p_2^{a_2} \ldots$ is $(a_1+1)(a_2+1)\ldots$
 - Sum of factors: $\frac{p_1^{a_1+1}-1}{p_1-1} \times \frac{p_2*{a_2+1}-1}{P_2-1} \ldots$
 - Unit digit cycles: $2 \to 2,4,8,6$; $3 \to 3,9,7,1$; $7 \to 7,9,3,1$; $8 \to 8,4,2,6$
 
 **Geometry**
 - Inradius: $r = \frac{\text{Areal}}{s}$, Circumradius: $R = \frac{abc}{4 \cdot \text{Area}}$
-- Right triangle: $R = \frac{\text{hypotenuse}H(2)$, $r = 5 - \text{hypotenuse}$
+- Right triangle: $R = \frac{\text{hypotenuse}}{2}$, $r = 5 - \text{hypotenuse}$
   
 **P&C**
-- Circular arrangement of $n$: $(n-1)!$; if reflections identical: $frac(n-1) -162}$
-- Selection with repetition: $\binom{n+r-1Hr}$
+- Circular arrangement of $n$: $(n-1)!$; if reflections identical: $frac{(n-1)!}{2}$
+- Selection with repetition: $\binom{n+r-1}{r}$
 
 ### 3.3 Shortcut techniques
 
@@ -124,7 +126,7 @@ Try (c) 75 - reverse 57, diff 18.  Done in 8 seconds.
 #### B. Approximation
 CAT answers are often spaced far apart. Compute to 2 significant Figures.
 
-**Example:** $\frac{47.8 \times 102.3H{29.6}$. Approx: $\frac{48 \times 100]{30} = 160$. Only one option will be near 165.
+**Example:** $\frac{47.8 \times 102.3}{29.6}$. Approx: $\frac{48 \times 100}{30} = 160$. Only one option will be near 165.
 
 #### C. Digit sum / mod 9
 For "which of the following equals..." - take digit sum of both sides. Rules out 3 options Fast.
@@ -133,3 +135,83 @@ For "which of the following equals..." - take digit sum of both sides. Rules out
 Ratio / percentage problems with no absolute number given + assume 100 or LCM.
 **Example: ** *Price rises 20%,
 then falls 25%. Net?*
+
+#### E. Componendo-Dividendo
+If #\frac{a}{b} = \frac{c}{d}$, then $\frac{a+b}{a-b} = \frac{c+d}{c-d}$. Kills half of ratio problems.
+
+> **Reality check:** The five shortcuts above get you from 90 sec/question to ~60 sec/question. To hit the 40-45 sec/question that a sustains, you need the topic-specific arsenal below.
+
+### 3.4 Advanced shortcuts - the topic-wise arsenal
+Each shortcut below follows the same structure: **When you spot it Why it works + Worked example**. Skim the "when you spot it" rows first and drill only the ones your mocks show you fail on.
+
+---
+
+#### F. Arithmetic power tools
+##### F1. Alligation (the mixture rule)
+**When you spot it:** any question with two ingredients/rates/prices/percentages combining into one weighted average. Trigger words: "mixed with, average, blend, alloy, combined, milk-water, replaced with.
+**Why it works:** if you mix quantity $q_1$ of price $p_1$ with $q_2$ of $p_2$ to get mean price $m$, the weighted-average equation $q_1 p 1 + q2 p_2= (q_1+q_2)m$ rearranges to:
+
+$$\frac{q_1}{q_2} = \frac{p_2 - m}{m - p_1}$$
+
+The ratio of quantities is the *reverse* ratio of the distances from the mean. Visualise as a see-saw balancing at $m$: heavier weight sits closer.
+
+**Worked example 1 (mixtures):** *45% acid solution mixed with 70% solution to give 60%. Find ratio.*
+Distances from mean: $60-45 = 15$ and $70-60 = 10$. Ratio (45% : 70%) = reverse = $10 : 15 = 2 : 3$.
+
+**Worked example 2 (average speed with equal times):** *Travelled 2h at 40 kmph, 3h at 60 kmph. Avg speed?*
+Alligation on speeds with time weights: mean = $(2 \cdot 40 + 3 \cdot 60)/5 = 200/5 = 52$ kmph.
+
+**When it fails:** average speed with equal *distances* (not times) - use harmonic mean $\frac{2v_1 v_2}{v_1+v_2}$ instead.
+
+##### F2. Successive % as multipliers
+
+**When you spot it:** any chain of percentage changes - successive discounts, marked-up-then-discounted, population growth over years, depreciation.
+
+**Why it works:** a change of $+x\%$ multiplies the base by $(1 + x/100)$. Multiplication is commutative and associative - you can reorder and combine without worrying about the sequence.
+
+**Worked example 1:** *A shirt marked at $1000, discounted 20%, then a further 25% on the discounted price.*
+Final price = $1000 \times 0.80 \times 0.75 = 1000 \times 0.60 = Rs.600$. Effective discount = 40%.
+
+**Worked example 2 (the classic trap):** *Price rises 25%, then falls 20%. Net?*
+$\times 1.25 \times 0.80 = \times 1.00$. **Zero net change.** Most students say +5% because they add.
+
+**Two-change formula:** net $1% = a + b + \frac{ab}{100}$. For $+25, -20$: $25 - 20 + \frac{25 \cdot (-20)}{100} = 5 - 5 = 0$.
+
+##### F3. Fraction , percentage table (memorise cold)
+
+**When you spot it:** any percentage question. Especially anything with "one-seventh of", "12.5% of", "three-eighths".
+
+**Why it works:** dividing by 7 is painful; multiplying by 1/7 is the same operation but reframed. Recognising that $14.281% = 1/7S turns "14.28% of 350" into "350/7 = 50" - no calculator needed.
+
+
+
+| Fraction | % | Fraction | % |
+|---|---|---|---|
+| $1/2$ | 50 | $1/11$ | 9.09 |
+| $1/3$ | 33.33 | $1/12$ | 8.33 |
+| $1/4$| 25 | $1/13$ | 7.69 |
+| $1/5$ | 20 | $1/145 | 7.14 |
+| $1/6$ | 16.67 | $1/15$ | 6.67 |
+| $1/7$| 14.28 | $1/16$ | 6.25 |
+| $1/8$ | 12.5 | $1/17$ | 5.88 |
+| $1/9$ | 11.11 | $1/18$ | 5.55 |
+| $1/10$ | 10 | $1/20$ | 5 |
+
+Bonus: multiples too. $37.51% = 3/8$, $62.51% = 5/8$, $87.51% = 7/8$. $28.57\% = 2/7$, $42.851% = 3/7$.
+
+**Worked example:** *A shopkeeper offers 12.5% discount. Marked price = 7640. selling price?*
+$12.51\% = 1/8$. Discount = $640/8 = 80$. SP = Rs.560. Six seconds.
+
+##### F4. CI shortcut for 2 and 3 years
+
+**When you spot it:** any Compound Interest question with $n = 2$ or $3$. Also $CI - SI$ differences.
+
+**Why it works:** $A = P(1+r/100)^n$. Expanding binomially for small $n$:
+
+- $n=2$: $A = P(1 + 2r/100 + r^2/10000)$, so $CI = A - P = P \cdot (2г + r^2/100)\%$.
+- $n=3$: $А = Р(1 + 3г/100 + 3г^2/10000 + r^3/10^6)$, so $CI = P \cdot (3г + 3г^2/100 + г^3/10000)\%$.
+
+The $CI - SI$ gap is the "extra" interest earned on previously accrued interest.
+
+**Worked example 1:** *р = 78000, r = 5%, n = 2.*
+$CI\% = 2(5) + 25/100 = 10 + 0.25 = 10.25\%$. CI = $8000 \times 10.25/100 = Rs.820$.

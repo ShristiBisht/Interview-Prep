@@ -144,7 +144,7 @@ Digit sum of 19 = 10 - 1. So $19^5 lequiv 1^5 = 1 \pmod 9$.
 (a) $2+4+7+6+0+9+9 = 37 \to 1$ (correct). (b) 38 + 2 X. (c) 39 + 3 X. (d) 39 + 3 X. **Answer: (a).**
 
 **Example 3 (sum check):** *$1! + 2! + 3! + ILdots + 10! = 7$* Options: (a) 4,037,913 (b) 4,037,923 (c) 4,037,933 (d) 4,137,913.
-Digit sums of $1!$ to $10!$: 1, 2, 6, 24+6, 120+3, 720+9+0, 5040÷9+0, 40320+9+0, 362880+9+0, 3628800+9+0. Sum = $1+2+6+б+3+0+0+0+0+0=18_\to_0 \pmod 9$.
+Digit sums of $1!$ to $10!$: 1, 2, 6, 24->6, 120->3, 720->9->0, 5040->9->0, 40320->9->0, 362880->9->0, 3628800+9+0. Sum = $1+2+6+б+3+0+0+0+0+0 = 18 \to 0 \pmod 9$.
 (a) $4+0+3+7+9+1+3 = 27 \to 0$ V. (b) 28 + 1 X. (c) 29 ÷ 2 X. (d) 28 + 1 X. **Answer: (a).**
 
 > **Limitation** digit sum is a **necessary** and not a **sufficient** condition. Two options can share the same digit sum. If that happens. fall back to unit-digit check or a partial calculation. But on CAT, the setter usually spreads the options across residues - one filter kills three options.

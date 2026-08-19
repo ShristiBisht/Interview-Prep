@@ -458,21 +458,6 @@ Avoid `synchronized(this)` on classes whose instances are exposed (callers could
 
 ## 7. ReentrantLock, ReadWriteLock, StampedLock
 
-
-
-private Final Reentrantlock lock = new ReentrantLock(=
-
-
-private final Condition notEmpty = lock. newCondition();
-
-
-private final Condition notFull = lock newCondition();
-
-
-private final Object[] slots;
-
-
-
 ### 7.1 The Decision Table
 
 | Need | Use | Why |

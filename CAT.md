@@ -133,8 +133,9 @@ For "which of the following equals..." - take digit sum of both sides. Rules out
 
 #### D. Assume convenient numbers
 Ratio / percentage problems with no absolute number given + assume 100 or LCM.
-**Example: ** *Price rises 20%,
-then falls 25%. Net?*
+
+**Example: ** *Price rises 20%, then falls 25%. Net?*
+Assume 100 -> 120 -> 90. Net -10%. Done. 
 
 #### E. Componendo-Dividendo
 If #\frac{a}{b} = \frac{c}{d}$, then $\frac{a+b}{a-b} = \frac{c+d}{c-d}$. Kills half of ratio problems.
@@ -149,7 +150,11 @@ Each shortcut below follows the same structure: **When you spot it Why it works 
 #### F. Arithmetic power tools
 ##### F1. Alligation (the mixture rule)
 **When you spot it:** any question with two ingredients/rates/prices/percentages combining into one weighted average. Trigger words: "mixed with, average, blend, alloy, combined, milk-water, replaced with.
-**Why it works:** if you mix quantity $q_1$ of price $p_1$ with $q_2$ of $p_2$ to get mean price $m$, the weighted-average equation $q_1 p 1 + q2 p_2= (q_1+q_2)m$ rearranges to:
+**Why it works:** if you mix quantity $q_1$ of price $p_1$ with $q_2$ of $p_2$ to get mean price $m$, the weighted-average equation 
+
+$q_1 p 1 + q2 p_2= (q_1+q_2)m$ 
+
+rearranges to:
 
 $$\frac{q_1}{q_2} = \frac{p_2 - m}{m - p_1}$$
 
@@ -215,3 +220,72 @@ The $CI - SI$ gap is the "extra" interest earned on previously accrued interest.
 
 **Worked example 1:** *р = 78000, r = 5%, n = 2.*
 $CI\% = 2(5) + 25/100 = 10 + 0.25 = 10.25\%$. CI = $8000 \times 10.25/100 = Rs.820$.
+
+**Worked example 2 ($CI - SI$ difference):** *If $CI - SI$ over 2 years at 10% is Rs.50, find P.* 
+$P (r/100)^2 = 50 \Rightarrow P (0.1)^2 = 50 Rightarrow P = Rs.5000$.
+
+##### F5. Time-work as fractions of 1
+
+**When you spot it:** any "A can do it in X days, B in Y days, working together..." Also pipes and cisterns.
+
+**Why it works:** treat the total job as 1 unit. If A finishes in 12 days, A does $1/12$ of the job per day. Rates *add* - the physics is that everyone works simultaneously and contributions accumulate.
+
+**Worked example 1:** *A in 12 days, B in 18 days. Together?*
+Combined rate = $1/12 + 1/18 = 3/36 + 2/36 = 5/36$ per day. Time = $36/5 = 7.25 days.
+
+**Worked example 2 (pipes with leak):** *Inlet fills in 6h, Leak empties full tank in 15h. Time to fiLL?*
+Net rate = $1/6 - 1/15 = 5/30 - 2/30 = 3/30 = 1/10$. Time = 18h.
+
+**LCM trick for cleaner arithmetic:** assume total work = LCM of individual days. In example 1, work = 36 units, A does 3/day, B does 2/day, together 5/
+day -> 36/5 = 7.2 days. Same answer, no fractions in mid-calculation.
+
+---
+
+#### G. Number theory arsenal
+
+##### G1. Modular arithmetic - the language of remainders
+
+**When you spot it:** *"Find the remainder when ... is divided by ..."*, *"Last three digits of ..."*, *"Which of these is divisibLe by …"*.
+
+**Why it works:** we write $a \equiv b \pmod{m}$ to mean "$a$ and $b$ leave the same reminder when divided by $m$". The rules are:
+
+- $(a+b) \bmod m = ((a \bmod m) + (b \bmod m)) \bmod m$
+- $(a \cdot b) \bmod m = ((a \bmod m) \cdot (b \bmod m)) \bmod m$
+- $a^n \bmod m = (a \bmod m)^n \bmod m$
+
+You *never* compute the huge number - you reduce at each step.
+
+**Worked example:** *Remainder of $17 \times 23 \times 41$ divided by 10.*
+Each mod 10: $17 \equiv 7$, $23 equiv 3$, $41 \equiv 1$. Product mod 10: $7 \times 3 \times 1 = 21 \equiv 1$. Answer: 1.
+
+##### G2. Fermat's little theorem (for prime moduli)
+
+**When you spot it:** remainder of a large power divided by a *prime* number.
+
+**Statement:** for prime $p$ and $\gcd(a, P) = 1$: $a*{p-1} \equiv 1 \pmod{P}$.
+
+**Why it works:** in modular arithmetic mod $p$, the non-zero residues form a group of size $p-1$. Any element raised to the group order returns to
+identity (= 1).
+
+**worked example：** *Remainder of $2^（100｝$ divided by 7.*
+By Fermat: $2^{6} \equiv 1 \pmod 7$. $100 = 6 \times 16 + 4$. 50 $2^{100} = (2^6)^{16} \cdot 2^4 \equiv 1 \cdot 16 \equiv 16 - 14 \equiv 2 \pmod 7$.
+
+**Euler's generalisation (non-prime modulus):** $a^{\phi(m)} \equiv 1 \pmod m$ if $\gcd(a,m)=1$, where $\phi(m)$ counts integers up to $m$ coprime to $m$. For $m=100$: $\phi(100)=40$, so $a^{40} \equiv 1 \pmod{100}$ for $a$ coprime to 10.
+
+##### G3. Negative remainders (cleaner than positive)
+
+**When you spot it:** the base is close to the divisor from above - e.g. remainder of $99^k$ by 100, or $23^k$ by 25.
+
+**Why it works:** $99 \equiv -1 \pmod{100}$ is easier to raise to powers than 99. Sign Flips predictably; magnitude stays 1.
+
+**Worked example:** *Remainder of $99^(100)$ by 100.*
+$99 \equiv -1$. So $99^{100} \equiv (-1)^{100} = 1$. Answer: 1. If it were $99^{99}$: $(-1)^{99} = -1 \equiv 99 \pmod{100}$.
+
+##### G4. Chinese Remainder Theorem (intuition, not formula)
+
+**When you spot it:** *"Find the smallest number that Leaves remainder 3 when divided by 5, and remainder 4 when divided by 7."*
+
+**Why it works:** if moduli are coprime, the pair of remainders uniquely identifies a residue mod (product). You don't need the formula - enumerate.
+
+**Worked example:** *Remainder 3 mod 5, remainder 4 mod 7.*
+Numbers = 4 mod 7: 4, 11, 18, 25, 32. Check which is = 3 mod 5: 18. So $N \equiv 18 \pmod{35}$.
